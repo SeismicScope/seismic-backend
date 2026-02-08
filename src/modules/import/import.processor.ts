@@ -16,8 +16,22 @@ export class ImportProcessor extends WorkerHost {
   }
 
   async process(job: Job<{ filePath: string; jobId: number }>): Promise<any> {
+    console.log("Worker started processing file:", job.data.filePath);
     const { filePath, jobId } = job.data;
-    const stream = fs.createReadStream(filePath).pipe(csv());
+
+    if (!fs.existsSync(filePath)) {
+      throw new Error(`File not found: ${filePath}`);
+    }
+
+    const stream = fs.createReadStream(filePath).pipe(
+      csv({
+        separator: ",",
+        strict: false,
+        mapHeaders: ({ header }) => header.replace(/^\uFEFF/, "").trim(),
+      }),
+    );
+
+    stream.on("error", (err) => console.error("Error reading file:", err));
 
     let batch: any[] = [];
     let processedCount = 0;
@@ -29,8 +43,11 @@ export class ImportProcessor extends WorkerHost {
 
     try {
       for await (const row of stream) {
-        batch.push(transformRow(row));
+        const transformed = transformRow(row);
 
+        if (transformed) {
+          batch.push(transformed);
+        }
         if (batch.length === BATCH_SIZE) {
           await this.processBatch({
             batch,
@@ -38,6 +55,7 @@ export class ImportProcessor extends WorkerHost {
             currentTotal: processedCount + batch.length,
           });
           processedCount += batch.length;
+          console.log(`Successfully processed ${processedCount} rows...`);
           batch = [];
         }
       }
@@ -56,10 +74,13 @@ export class ImportProcessor extends WorkerHost {
         data: { status: "completed", processed: processedCount },
       });
 
+      console.log(`Import finished! Total rows: ${processedCount}`);
+
       if (fs.existsSync(filePath)) {
         fs.unlinkSync(filePath);
       }
     } catch (error) {
+      console.error("Error processing file:", error);
       await this.prisma.importJob.update({
         where: { id: jobId },
         data: { status: "failed" },

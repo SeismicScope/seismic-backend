@@ -14,11 +14,19 @@ export class MapService {
   async getMap(dto: GetMapDto) {
     const { west, south, east, north } = dto;
 
-    return this.prisma.$queryRaw`
-    SELECT *
-    FROM "${DB_EARTHQUAKE_NAME}"
-    WHERE geom && ST_MakeEnvelope(${west}, ${south}, ${east}, ${north}, ${SRID})
-    LIMIT ${MAP_POINTS_LIMIT};
-    `;
+    return this.prisma.$queryRawUnsafe(
+      `
+      SELECT id, "externalId", "occuredAt", magnitude, depth, latitude, longitude, location, "createdAt"
+      FROM "${DB_EARTHQUAKE_NAME}"
+      WHERE geom && ST_MakeEnvelope($1, $2, $3, $4, $5)
+      LIMIT $6;
+    `,
+      west,
+      south,
+      east,
+      north,
+      SRID,
+      MAP_POINTS_LIMIT,
+    );
   }
 }

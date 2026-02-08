@@ -17,6 +17,11 @@ model Earthquake {
   location   String?
   createdAt  DateTime                 @default(now())
   geom       Unsupported("geometry")?
+
+  @@index([magnitude], map: "earthquake_magnitude_idx")
+  @@index([occuredAt], map: "earthquake_occuredAt_idx")
+  @@index([magnitude, occuredAt], map: "earthquake_mag_date_idx")
+  @@index([geom], map: "Earthquake_geom_idx", type: Gist)
 }
 
 model ImportJob {

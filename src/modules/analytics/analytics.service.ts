@@ -9,11 +9,11 @@ export class AnalyticsService {
   constructor(private readonly prisma: PrismaService) {}
 
   async magnitudeDistribution() {
-    return this.prisma.$queryRaw`
-    SELECT floor(magnitude)::integer as bucket, count(*)::integer as count
-    FROM "${DB_EARTHQUAKE_NAME}"
-    GROUP BY bucket
-    ORDER BY bucket
-    `;
+    return this.prisma.$queryRawUnsafe(`
+      SELECT floor(magnitude)::integer as bucket, count(*)::integer as count
+      FROM "${DB_EARTHQUAKE_NAME}"
+      GROUP BY bucket
+      ORDER BY bucket
+    `);
   }
 }

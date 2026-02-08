@@ -4,11 +4,12 @@ import { Module } from "@nestjs/common";
 import { PrismaModule } from "../../../prisma/prisma.module";
 import { AuthModule } from "../auth/auth.module";
 import { ImportController } from "./import.controller";
+import { ImportProcessor } from "./import.processor";
 import { ImportService } from "./import.service";
 
 @Module({
   controllers: [ImportController],
-  providers: [ImportService],
+  providers: [ImportService, ImportProcessor],
   imports: [
     PrismaModule,
     AuthModule,
