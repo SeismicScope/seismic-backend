@@ -1,11 +1,16 @@
 import {
   Controller,
+  Get,
+  Param,
+  ParseIntPipe,
   Post,
   UploadedFile,
   UseGuards,
   UseInterceptors,
 } from "@nestjs/common";
 import { FileInterceptor } from "@nestjs/platform-express";
+import { diskStorage } from "multer";
+import { extname } from "path";
 
 import { JwtGuard } from "../auth/guards/jwt.guard";
 import { RolesGuard } from "../auth/guards/roles.guard";
@@ -17,10 +22,27 @@ export class ImportController {
 
   @UseGuards(JwtGuard, RolesGuard)
   @Post("upload")
-  @UseInterceptors(FileInterceptor("file"))
+  @UseInterceptors(
+    FileInterceptor("file", {
+      storage: diskStorage({
+        destination: "./uploads",
+        filename: (req, file, cb) => {
+          const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
+          cb(
+            null,
+            `${file.fieldname}-${uniqueSuffix}${extname(file.originalname)}`,
+          );
+        },
+      }),
+    }),
+  )
   async upload(@UploadedFile() file: Express.Multer.File) {
-    await this.importService.addImportJob(file.path);
+    return this.importService.createImport(file.path, file.originalname);
+  }
 
-    return { status: "queued" };
+  @UseGuards(JwtGuard)
+  @Get("status/:id")
+  async getStatus(@Param("id", ParseIntPipe) id: number) {
+    return this.importService.getImportStatus(id);
   }
 }

@@ -1,43 +1,97 @@
 import { Processor, WorkerHost } from "@nestjs/bullmq";
-import { Prisma, PrismaClient } from "@prisma/client";
 import { Job } from "bullmq";
 import csv from "csv-parser";
 import * as fs from "fs";
 
+import { PrismaService } from "../../../prisma/prisma.service";
 import { DB_EARTHQUAKE_NAME, SRID } from "../../constants";
 import { transformRow } from "./helpers";
 
-const BATCH_SIZE = 1000;
-const WORKERS = 1;
+const BATCH_SIZE = 5000;
 
-@Processor("import-earthquakes", { concurrency: WORKERS, lockDuration: 300000 })
+@Processor("import-earthquakes", { concurrency: 1, lockDuration: 600000 })
 export class ImportProcessor extends WorkerHost {
-  private prisma = new PrismaClient();
+  constructor(private readonly prisma: PrismaService) {
+    super();
+  }
 
-  async process(job: Job<any, any, string>): Promise<any> {
-    const { filePath } = job.data;
+  async process(job: Job<{ filePath: string; jobId: number }>): Promise<any> {
+    const { filePath, jobId } = job.data;
     const stream = fs.createReadStream(filePath).pipe(csv());
-    let batch = [];
 
-    for await (const row of stream) {
-      batch.push(transformRow(row));
+    let batch: any[] = [];
+    let processedCount = 0;
 
-      if (batch.length === BATCH_SIZE) {
-        await this.prisma.earthquake.createMany({ data: batch });
-        batch = [];
+    await this.prisma.importJob.update({
+      where: { id: jobId },
+      data: { status: "processing" },
+    });
+
+    try {
+      for await (const row of stream) {
+        batch.push(transformRow(row));
+
+        if (batch.length === BATCH_SIZE) {
+          await this.processBatch({
+            batch,
+            jobId,
+            currentTotal: processedCount + batch.length,
+          });
+          processedCount += batch.length;
+          batch = [];
+        }
       }
+
+      if (batch.length > 0) {
+        await this.processBatch({
+          batch,
+          jobId,
+          currentTotal: processedCount + batch.length,
+        });
+        processedCount += batch.length;
+      }
+
+      await this.prisma.importJob.update({
+        where: { id: jobId },
+        data: { status: "completed", processed: processedCount },
+      });
+
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
+    } catch (error) {
+      await this.prisma.importJob.update({
+        where: { id: jobId },
+        data: { status: "failed" },
+      });
+      throw error;
     }
 
-    if (batch.length > 0) {
-      await this.prisma.earthquake.createMany({ data: batch });
-    }
+    return { success: true, total: processedCount };
+  }
 
-    await this.prisma.$executeRawUnsafe(`
-      UPDATE ${Prisma.raw(DB_EARTHQUAKE_NAME)}
-      SET geom = ST_SetSRID(ST_MakePoint(longitude, latitude), ${SRID}) 
-      WHERE geom IS NULL
-    `);
+  private async processBatch({
+    batch = [],
+    jobId,
+    currentTotal,
+  }: {
+    batch: any[];
+    jobId: number;
+    currentTotal: number;
+  }) {
+    await this.prisma.$transaction(async (tx) => {
+      await tx.earthquake.createMany({ data: batch });
 
-    return { success: true };
+      await tx.$executeRawUnsafe(`
+        UPDATE "${DB_EARTHQUAKE_NAME}"
+        SET geom = ST_SetSRID(ST_MakePoint(longitude, latitude), ${SRID}) 
+        WHERE geom IS NULL
+      `);
+    });
+
+    await this.prisma.importJob.update({
+      where: { id: jobId },
+      data: { processed: currentTotal },
+    });
   }
 }

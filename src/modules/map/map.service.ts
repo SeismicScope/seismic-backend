@@ -16,7 +16,7 @@ export class MapService {
 
     return this.prisma.$queryRaw`
     SELECT *
-    FROM ${Prisma.raw(DB_EARTHQUAKE_NAME)}
+    FROM "${DB_EARTHQUAKE_NAME}"
     WHERE geom && ST_MakeEnvelope(${west}, ${south}, ${east}, ${north}, ${SRID})
     LIMIT ${MAP_POINTS_LIMIT};
     `;

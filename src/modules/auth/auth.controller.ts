@@ -1,7 +1,8 @@
-import { Controller, Post, Res } from "@nestjs/common";
+import { Controller, Get, Post, Req, Res, UseGuards } from "@nestjs/common";
 import { Response } from "express";
 
 import { AuthService } from "./auth.service";
+import { JwtGuard } from "./guards/jwt.guard";
 
 @Controller("auth")
 export class AuthController {
@@ -25,5 +26,11 @@ export class AuthController {
     res.clearCookie("access_token");
 
     return { success: true };
+  }
+
+  @Get("me")
+  @UseGuards(JwtGuard)
+  getMe(@Req() req: Request) {
+    return (req as any).user;
   }
 }
