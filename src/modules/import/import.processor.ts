@@ -1,9 +1,10 @@
 import { Processor, WorkerHost } from "@nestjs/bullmq";
-import { PrismaClient } from "@prisma/client";
+import { Prisma, PrismaClient } from "@prisma/client";
 import { Job } from "bullmq";
 import csv from "csv-parser";
 import * as fs from "fs";
 
+import { DB_EARTHQUAKE_NAME, SRID } from "../../constants";
 import { transformRow } from "./helpers";
 
 const BATCH_SIZE = 1000;
@@ -32,8 +33,8 @@ export class ImportProcessor extends WorkerHost {
     }
 
     await this.prisma.$executeRawUnsafe(`
-      UPDATE "Earthquake" 
-      SET geom = ST_SetSRID(ST_MakePoint(longitude, latitude), 4326) 
+      UPDATE ${Prisma.raw(DB_EARTHQUAKE_NAME)}
+      SET geom = ST_SetSRID(ST_MakePoint(longitude, latitude), ${SRID}) 
       WHERE geom IS NULL
     `);
 

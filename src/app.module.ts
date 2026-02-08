@@ -2,10 +2,13 @@ import { BullModule } from "@nestjs/bullmq";
 import { Module } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
 import { ConfigService } from "@nestjs/config";
+import { PrismaModule } from "prisma/prisma.module";
 
-import { AppController } from "./app.controller";
-import { AppService } from "./app.service";
+import { AnalyticsModule } from "./modules/analytics/analytics.module";
+import { AuthModule } from "./modules/auth/auth.module";
+import { EarthquakesModule } from "./modules/earthquakes/earthquakes.module";
 import { ImportModule } from "./modules/import/import.module";
+import { MapModule } from "./modules/map/map.module";
 
 @Module({
   imports: [
@@ -25,9 +28,14 @@ import { ImportModule } from "./modules/import/import.module";
         };
       },
     }),
+    PrismaModule,
     ImportModule,
+    EarthquakesModule,
+    MapModule,
+    AnalyticsModule,
+    AuthModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [],
+  providers: [],
 })
 export class AppModule {}
