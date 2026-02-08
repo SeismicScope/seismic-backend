@@ -1,11 +1,11 @@
 import { Module } from "@nestjs/common";
+import { PrismaModule } from "prisma/prisma.module";
 
-import { PrismaService } from "../../../prisma/prisma.service";
 import { MapController } from "./map.controller";
 import { MapService } from "./map.service";
 
 @Module({
-  imports: [PrismaService],
+  imports: [PrismaModule],
   controllers: [MapController],
   providers: [MapService],
 })
