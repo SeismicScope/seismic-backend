@@ -11,11 +11,24 @@ export class EarthquakesService {
   constructor(private readonly prisma: PrismaService) {}
 
   async getEarthquakes(filters: GetEarthquakesDto) {
-    const { cursor, limit = 50, minMag, maxMag, dateFrom, dateTo } = filters;
+    const {
+      cursor,
+      limit = 50,
+      minMag,
+      maxMag,
+      minDepth,
+      maxDepth,
+      dateFrom,
+      dateTo,
+    } = filters;
     const where: Prisma.EarthquakeWhereInput = {};
 
     if (minMag !== undefined || maxMag !== undefined) {
       where.magnitude = { gte: minMag, lte: maxMag };
+    }
+
+    if (minDepth !== undefined || maxDepth !== undefined) {
+      where.depth = { gte: minDepth, lte: maxDepth };
     }
 
     if (dateFrom || dateTo) {

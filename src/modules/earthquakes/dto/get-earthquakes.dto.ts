@@ -27,6 +27,16 @@ export class GetEarthquakesDto {
   maxMag?: number;
 
   @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  minDepth?: number;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  maxDepth?: number;
+
+  @IsOptional()
   @Type(() => Date)
   @IsDate()
   dateFrom?: Date;
