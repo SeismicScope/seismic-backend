@@ -8,19 +8,29 @@ import {
 } from "@/lib/build-earthquake-where";
 import type { GetEarthquakesDto } from "@/modules/earthquakes/dto/get-earthquakes.dto";
 
+import type { TimeSeriesDto } from "./dto/time-series.dto";
+
+const PG_INTERVALS = {
+  day: "day",
+  week: "week",
+  month: "month",
+  year: "year",
+} as const;
+
 @Injectable()
 export class AnalyticsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async timeSeries(filters: GetEarthquakesDto) {
+  async timeSeries(filters: TimeSeriesDto) {
     const { sql, params } = buildEarthquakeWhereSql(filters);
+    const trunc = PG_INTERVALS[filters.interval];
 
     const rows = await this.prisma.$queryRawUnsafe<
       { date: Date; count: bigint }[]
     >(
       `
       SELECT
-        DATE_TRUNC('day', "occuredAt") as date,
+        DATE_TRUNC('${trunc}', "occuredAt") as date,
         COUNT(*) as count
       FROM "${DB_EARTHQUAKE_NAME}"
       WHERE 1=1

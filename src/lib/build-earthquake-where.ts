@@ -1,9 +1,9 @@
 import type { Prisma } from "@prisma/client";
 
-import type { GetEarthquakesDto } from "@/modules/earthquakes/dto/get-earthquakes.dto";
+import type { EarthquakeFilterParams } from "@/types";
 
 export function buildEarthquakeWhere(
-  filters: GetEarthquakesDto,
+  filters: EarthquakeFilterParams,
 ): Prisma.EarthquakeWhereInput {
   const where: Prisma.EarthquakeWhereInput = {};
 
@@ -22,7 +22,7 @@ export function buildEarthquakeWhere(
   return where;
 }
 
-export function buildEarthquakeWhereSql(filters: GetEarthquakesDto) {
+export function buildEarthquakeWhereSql(filters: EarthquakeFilterParams) {
   const conditions: string[] = [];
   const params: (number | Date)[] = [];
   let idx = 1;
