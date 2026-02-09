@@ -12,13 +12,8 @@ export class EarthquakesController {
     return this.earthquakesService.getEarthquakes(query);
   }
 
-  @Get("stats")
-  async getEarthquakesStats() {
-    return this.earthquakesService.getEarthquakesStats();
-  }
-
   @Get("magnitude-histogram")
-  async getEarthquakesMagnitudeHistogram() {
-    return this.earthquakesService.getEarthquakesMagnitudeHistogram();
+  async getEarthquakesMagnitudeHistogram(@Query() query: GetEarthquakesDto) {
+    return this.earthquakesService.getEarthquakesMagnitudeHistogram(query);
   }
 }

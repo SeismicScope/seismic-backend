@@ -1,7 +1,26 @@
 import { Type } from "class-transformer";
-import { IsDate, IsNumber, IsOptional, Max, Min } from "class-validator";
+import {
+  IsDate,
+  IsIn,
+  IsNumber,
+  IsOptional,
+  IsString,
+  Max,
+  Min,
+} from "class-validator";
 
 import { DEFAULT_EARTHQUAKE_LIMIT } from "@/constants";
+
+export const SORT_OPTIONS = [
+  "date_asc",
+  "date_desc",
+  "magnitude_asc",
+  "magnitude_desc",
+  "depth_asc",
+  "depth_desc",
+] as const;
+
+export type SortOption = (typeof SORT_OPTIONS)[number];
 
 export class GetEarthquakesDto {
   @IsOptional()
@@ -15,6 +34,11 @@ export class GetEarthquakesDto {
   @Min(1)
   @Max(100)
   limit: number = DEFAULT_EARTHQUAKE_LIMIT;
+
+  @IsOptional()
+  @IsString()
+  @IsIn(SORT_OPTIONS)
+  sort?: SortOption;
 
   @IsOptional()
   @Type(() => Number)
