@@ -14,7 +14,7 @@ export class AuthController {
 
     res.cookie("access_token", access_token, {
       httpOnly: true,
-      sameSite: "lax",
+      sameSite: "none",
       secure: process.env.NODE_ENV === "production",
     });
 
