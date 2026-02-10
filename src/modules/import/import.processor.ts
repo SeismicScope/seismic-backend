@@ -26,12 +26,10 @@ export class ImportProcessor extends WorkerHost {
     const stream = fs.createReadStream(filePath).pipe(
       csv({
         separator: ",",
-        strict: true,
+        strict: false,
         mapHeaders: ({ header }) => header.replace(/^\uFEFF/, "").trim(),
       }),
     );
-
-    stream.on("error", (err) => console.error("Error reading file:", err));
 
     let batch: any[] = [];
     let processedCount = 0;
