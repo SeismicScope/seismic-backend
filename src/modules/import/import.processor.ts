@@ -26,7 +26,7 @@ export class ImportProcessor extends WorkerHost {
     const stream = fs.createReadStream(filePath).pipe(
       csv({
         separator: ",",
-        strict: false,
+        strict: true,
         mapHeaders: ({ header }) => header.replace(/^\uFEFF/, "").trim(),
       }),
     );
@@ -101,7 +101,7 @@ export class ImportProcessor extends WorkerHost {
     currentTotal: number;
   }) {
     await this.prisma.$transaction(async (tx) => {
-      await tx.earthquake.createMany({ data: batch });
+      await tx.earthquake.createMany({ data: batch, skipDuplicates: true });
 
       await tx.$executeRawUnsafe(`
         UPDATE "${DB_EARTHQUAKE_NAME}"
