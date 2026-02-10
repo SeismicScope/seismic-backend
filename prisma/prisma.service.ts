@@ -14,6 +14,8 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
   }
 
   async onModuleInit() {
+    const start = Date.now();
     await this.$connect();
+    console.log(`🚀 Prisma connected in ${Date.now() - start}ms`);
   }
 }

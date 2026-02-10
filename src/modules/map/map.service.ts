@@ -4,7 +4,7 @@ import { PrismaService } from "prisma/prisma.service";
 import { DB_EARTHQUAKE_NAME, SRID } from "../../constants";
 import { GetMapDto } from "./dto/get-map.dto";
 
-const MAP_POINTS_LIMIT = 100000;
+const MAP_POINTS_LIMIT = 70000;
 
 @Injectable()
 export class MapService {
