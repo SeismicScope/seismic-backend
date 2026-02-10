@@ -19,4 +19,4 @@ COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/package*.json ./
 
 EXPOSE 8080
-CMD ["npm", "run", "start:prod"]
+CMD ["node", "dist/src/main.js"]
