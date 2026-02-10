@@ -1,5 +1,5 @@
 import { Type } from "class-transformer";
-import { IsDefined, IsNumber } from "class-validator";
+import { IsDefined, IsNumber, IsOptional } from "class-validator";
 
 export class GetMapDto {
   @IsDefined({ message: "West is required" })
@@ -21,4 +21,9 @@ export class GetMapDto {
   @Type(() => Number)
   @IsNumber()
   north?: number;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  zoom?: number;
 }
