@@ -31,6 +31,12 @@ export class AuthController {
   @Get("me")
   @UseGuards(JwtGuard)
   getMe(@Req() req: Request) {
-    return (req as any).user;
+    console.log("User:", (req as any).user);
+
+    return {
+      success: true,
+      user: (req as any).user,
+      role: "admin",
+    };
   }
 }
