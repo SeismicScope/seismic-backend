@@ -8,14 +8,8 @@ import {
 } from "@/lib/build-earthquake-where";
 import type { GetEarthquakesDto } from "@/modules/earthquakes/dto/get-earthquakes.dto";
 
+import { PG_INTERVALS } from "./constants";
 import type { TimeSeriesDto } from "./dto/time-series.dto";
-
-const PG_INTERVALS = {
-  day: "day",
-  week: "week",
-  month: "month",
-  year: "year",
-} as const;
 
 @Injectable()
 export class AnalyticsService {
@@ -25,12 +19,18 @@ export class AnalyticsService {
     const { sql, params } = buildEarthquakeWhereSql(filters);
     const trunc = PG_INTERVALS[filters.interval];
 
+    if (!trunc) {
+      throw new Error(`Invalid interval: ${filters.interval}`);
+    }
+
+    const idx = params.length + 1;
+
     const rows = await this.prisma.$queryRawUnsafe<
       { date: Date; count: bigint }[]
     >(
       `
       SELECT
-        DATE_TRUNC('${trunc}', "occuredAt") as date,
+        DATE_TRUNC($${idx}, "occuredAt") as date,
         COUNT(*) as count
       FROM "${DB_EARTHQUAKE_NAME}"
       WHERE 1=1
@@ -39,6 +39,7 @@ export class AnalyticsService {
       ORDER BY date ASC
     `,
       ...params,
+      trunc,
     );
 
     return rows.map((r) => ({

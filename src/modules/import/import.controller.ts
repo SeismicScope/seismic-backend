@@ -34,6 +34,16 @@ export class ImportController {
           );
         },
       }),
+      limits: {
+        fileSize: 100 * 1024 * 1024, // 100 MB
+      },
+      fileFilter: (_req, file, cb) => {
+        if (extname(file.originalname).toLowerCase() !== ".csv") {
+          return cb(new Error("Only CSV files are allowed"), false);
+        }
+
+        cb(null, true);
+      },
     }),
   )
   async upload(@UploadedFile() file: Express.Multer.File) {

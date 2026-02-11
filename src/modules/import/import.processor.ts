@@ -73,10 +73,6 @@ export class ImportProcessor extends WorkerHost {
       });
 
       console.log(`Import finished! Total rows: ${processedCount}`);
-
-      if (fs.existsSync(filePath)) {
-        fs.unlinkSync(filePath);
-      }
     } catch (error) {
       console.error("Error processing file:", error);
       await this.prisma.importJob.update({
@@ -84,6 +80,10 @@ export class ImportProcessor extends WorkerHost {
         data: { status: "failed" },
       });
       throw error;
+    } finally {
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
     }
 
     return { success: true, total: processedCount };

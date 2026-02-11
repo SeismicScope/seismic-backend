@@ -7,6 +7,7 @@ import { PrismaModule } from "prisma/prisma.module";
 import { AnalyticsModule } from "./modules/analytics/analytics.module";
 import { AuthModule } from "./modules/auth/auth.module";
 import { EarthquakesModule } from "./modules/earthquakes/earthquakes.module";
+import { HealthModule } from "./modules/health/health.module";
 import { ImportModule } from "./modules/import/import.module";
 import { MapModule } from "./modules/map/map.module";
 
@@ -29,6 +30,7 @@ import { MapModule } from "./modules/map/map.module";
       },
     }),
     PrismaModule,
+    HealthModule,
     ImportModule,
     EarthquakesModule,
     MapModule,

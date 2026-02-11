@@ -30,7 +30,7 @@ export class ImportService {
 
   async updateStatus(
     id: number,
-    data: { status?: string; processed?: number; totalRows?: number },
+    data: { status?: string; processed?: number },
   ) {
     return this.prisma.importJob.update({
       where: { id },
