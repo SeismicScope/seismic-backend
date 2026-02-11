@@ -2,6 +2,7 @@ import { BullModule } from "@nestjs/bullmq";
 import { Module } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
 import { ConfigService } from "@nestjs/config";
+import { SentryModule } from "@sentry/nestjs/setup";
 import { PrismaModule } from "prisma/prisma.module";
 
 import { AnalyticsModule } from "./modules/analytics/analytics.module";
@@ -13,6 +14,7 @@ import { MapModule } from "./modules/map/map.module";
 
 @Module({
   imports: [
+    SentryModule.forRoot(),
     ConfigModule.forRoot({ isGlobal: true }),
     BullModule.forRootAsync({
       inject: [ConfigService],
