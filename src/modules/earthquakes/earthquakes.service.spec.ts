@@ -1,11 +1,11 @@
 import { Test, TestingModule } from "@nestjs/testing";
 
 import { PrismaService } from "../../../prisma/prisma.service";
+import { RedisService } from "../redis/redis.service";
 import { EarthquakesService } from "./earthquakes.service";
 
 describe("EarthquakesService", () => {
   let service: EarthquakesService;
-  let prisma: PrismaService;
 
   const mockPrisma = {
     earthquake: {
@@ -16,16 +16,22 @@ describe("EarthquakesService", () => {
     $queryRawUnsafe: jest.fn(),
   };
 
+  const mockRedis = {
+    get: jest.fn(),
+    set: jest.fn(),
+    del: jest.fn(),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         EarthquakesService,
         { provide: PrismaService, useValue: mockPrisma },
+        { provide: RedisService, useValue: mockRedis },
       ],
     }).compile();
 
     service = module.get<EarthquakesService>(EarthquakesService);
-    prisma = module.get<PrismaService>(PrismaService);
 
     jest.clearAllMocks();
   });
@@ -114,6 +120,56 @@ describe("EarthquakesService", () => {
         }),
       );
     });
+
+    it("should apply date_asc sort", async () => {
+      mockPrisma.earthquake.findMany.mockResolvedValue([]);
+      mockPrisma.earthquake.count.mockResolvedValue(0);
+
+      await service.getEarthquakes({ limit: 50, sort: "date_asc" });
+
+      expect(mockPrisma.earthquake.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          orderBy: { occuredAt: "asc" },
+        }),
+      );
+    });
+
+    it("should apply depth_desc sort", async () => {
+      mockPrisma.earthquake.findMany.mockResolvedValue([]);
+      mockPrisma.earthquake.count.mockResolvedValue(0);
+
+      await service.getEarthquakes({ limit: 50, sort: "depth_desc" });
+
+      expect(mockPrisma.earthquake.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          orderBy: { depth: "desc" },
+        }),
+      );
+    });
+
+    it("should use default limit of 50 when not specified", async () => {
+      mockPrisma.earthquake.findMany.mockResolvedValue([]);
+      mockPrisma.earthquake.count.mockResolvedValue(0);
+
+      await service.getEarthquakes({} as any);
+
+      expect(mockPrisma.earthquake.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          take: 50,
+        }),
+      );
+    });
+
+    it("should return empty data array when no results", async () => {
+      mockPrisma.earthquake.findMany.mockResolvedValue([]);
+      mockPrisma.earthquake.count.mockResolvedValue(0);
+
+      const result = await service.getEarthquakes({ limit: 50 });
+
+      expect(result.data).toEqual([]);
+      expect(result.total).toBe(0);
+      expect(result.nextCursor).toBeNull();
+    });
   });
 
   describe("getEarthquakeById", () => {
@@ -140,6 +196,7 @@ describe("EarthquakesService", () => {
 
   describe("getEarthquakesMagnitudeHistogram", () => {
     it("should return formatted histogram data", async () => {
+      mockRedis.get.mockResolvedValue(null);
       mockPrisma.$queryRawUnsafe.mockResolvedValue([
         { bin: 2.0, count: BigInt(150) },
         { bin: 3.5, count: BigInt(300) },
@@ -155,6 +212,59 @@ describe("EarthquakesService", () => {
         { magnitude: 3.5, count: 300 },
         { magnitude: 5.0, count: 50 },
       ]);
+    });
+
+    it("should return cached histogram when available", async () => {
+      const cachedHistogram = [
+        { magnitude: 2.0, count: 150 },
+        { magnitude: 3.5, count: 300 },
+      ];
+      mockRedis.get.mockResolvedValue(cachedHistogram);
+
+      const result = await service.getEarthquakesMagnitudeHistogram({
+        limit: 50,
+      });
+
+      expect(result).toEqual(cachedHistogram);
+      expect(mockPrisma.$queryRawUnsafe).not.toHaveBeenCalled();
+    });
+
+    it("should cache histogram after fetching from DB", async () => {
+      mockRedis.get.mockResolvedValue(null);
+      mockPrisma.$queryRawUnsafe.mockResolvedValue([
+        { bin: 4.0, count: BigInt(100) },
+      ]);
+
+      await service.getEarthquakesMagnitudeHistogram({ limit: 50 });
+
+      expect(mockRedis.set).toHaveBeenCalledWith(
+        expect.stringContaining("histogram:"),
+        [{ magnitude: 4.0, count: 100 }],
+        300,
+      );
+    });
+
+    it("should handle empty histogram result", async () => {
+      mockRedis.get.mockResolvedValue(null);
+      mockPrisma.$queryRawUnsafe.mockResolvedValue([]);
+
+      const result = await service.getEarthquakesMagnitudeHistogram({
+        limit: 50,
+      });
+
+      expect(result).toEqual([]);
+    });
+
+    it("should build correct cache key from filters", async () => {
+      mockRedis.get.mockResolvedValue(null);
+      mockPrisma.$queryRawUnsafe.mockResolvedValue([]);
+
+      const filters = { limit: 50, minDepth: 10, maxDepth: 100 };
+      await service.getEarthquakesMagnitudeHistogram(filters);
+
+      expect(mockRedis.get).toHaveBeenCalledWith(
+        `histogram:${JSON.stringify(filters)}`,
+      );
     });
   });
 });

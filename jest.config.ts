@@ -11,7 +11,14 @@ const config: Config = {
   "^@/(.*)$": "<rootDir>/$1",
   "^prisma/(.*)$": "<rootDir>/../prisma/$1",
 },
-  collectCoverageFrom: ["**/*.(t|j)s"],
+  collectCoverageFrom: [
+    "**/*.(t|j)s",
+    "!**/main.ts",
+    "!**/instrument.ts",
+    "!**/app.module.ts",
+    "!**/*.module.ts",
+    "!**/*.dto.ts",
+  ],
   coverageDirectory: "../coverage",
   testEnvironment: "node",
 };

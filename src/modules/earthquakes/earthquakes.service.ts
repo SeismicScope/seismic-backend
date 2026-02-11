@@ -8,11 +8,17 @@ import {
   buildEarthquakeWhereSql,
 } from "@/lib/build-earthquake-where";
 
+import { RedisService } from "../redis/redis.service";
 import type { GetEarthquakesDto } from "./dto/get-earthquakes.dto";
+
+const HISTOGRAM_TTL = 300; // 5 minutes
 
 @Injectable()
 export class EarthquakesService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly redis: RedisService,
+  ) {}
 
   async getEarthquakes(filters: GetEarthquakesDto) {
     const { cursor, limit = 50, sort } = filters;
@@ -46,6 +52,12 @@ export class EarthquakesService {
   }
 
   async getEarthquakesMagnitudeHistogram(filters: GetEarthquakesDto) {
+    const cacheKey = `histogram:${JSON.stringify(filters)}`;
+    const cached =
+      await this.redis.get<{ magnitude: number; count: number }[]>(cacheKey);
+
+    if (cached) return cached;
+
     const { sql, params } = buildEarthquakeWhereSql(filters);
 
     const stats = await this.prisma.$queryRawUnsafe<
@@ -64,9 +76,13 @@ export class EarthquakesService {
       ...params,
     );
 
-    return stats.map((s) => ({
+    const result = stats.map((s) => ({
       magnitude: Number(Number(s.bin).toFixed(1)),
       count: Number(s.count),
     }));
+
+    await this.redis.set(cacheKey, result, HISTOGRAM_TTL);
+
+    return result;
   }
 }

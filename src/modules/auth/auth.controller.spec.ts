@@ -1,0 +1,76 @@
+import { Test, TestingModule } from "@nestjs/testing";
+
+import { AuthController } from "./auth.controller";
+import { AuthService } from "./auth.service";
+
+describe("AuthController", () => {
+  let controller: AuthController;
+
+  const mockService = {
+    login: jest.fn(),
+  };
+
+  beforeEach(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      controllers: [AuthController],
+      providers: [{ provide: AuthService, useValue: mockService }],
+    }).compile();
+
+    controller = module.get<AuthController>(AuthController);
+
+    jest.clearAllMocks();
+  });
+
+  describe("login", () => {
+    it("should set cookie and return success", () => {
+      mockService.login.mockReturnValue({ access_token: "jwt-token" });
+
+      const mockRes = {
+        cookie: jest.fn(),
+      } as any;
+
+      const result = controller.login(mockRes);
+
+      expect(result).toEqual({ success: true });
+      expect(mockRes.cookie).toHaveBeenCalledWith(
+        "access_token",
+        "jwt-token",
+        expect.objectContaining({
+          httpOnly: true,
+          sameSite: "none",
+        }),
+      );
+    });
+  });
+
+  describe("logout", () => {
+    it("should clear cookie and return success", () => {
+      const mockRes = {
+        clearCookie: jest.fn(),
+      } as any;
+
+      const result = controller.logout(mockRes);
+
+      expect(result).toEqual({ success: true });
+      expect(mockRes.clearCookie).toHaveBeenCalledWith(
+        "access_token",
+        expect.objectContaining({
+          httpOnly: true,
+          sameSite: "none",
+        }),
+      );
+    });
+  });
+
+  describe("getMe", () => {
+    it("should return user from request", () => {
+      const mockReq = {
+        user: { name: "Admin", role: "admin" },
+      } as any;
+
+      const result = controller.getMe(mockReq);
+
+      expect(result).toEqual({ name: "Admin", role: "admin" });
+    });
+  });
+});
