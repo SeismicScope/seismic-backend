@@ -9,6 +9,7 @@ REST API for earthquake data — import, storage, spatial queries, analytics, an
 | Frontend     | [seismic-scope.vercel.app](https://seismic-scope.vercel.app)   |
 | Backend      | [https://seismic-scope-be.rest](https://seismic-scope-be.rest) |
 | Swagger Docs | [/api/docs](https://seismic-scope-be.rest/api/docs)            |
+| Health check | [health check](https://seismic-scope-be.rest/health)           |
 
 ## Tech Stack
 
