@@ -12,13 +12,13 @@ export class EarthquakesController {
     return this.earthquakesService.getEarthquakes(query);
   }
 
-  @Get(":id")
-  async getEarthquakeById(@Param("id", ParseIntPipe) id: number) {
-    return this.earthquakesService.getEarthquakeById(id);
-  }
-
   @Get("magnitude-histogram")
   async getEarthquakesMagnitudeHistogram(@Query() query: GetEarthquakesDto) {
     return this.earthquakesService.getEarthquakesMagnitudeHistogram(query);
+  }
+
+  @Get(":id")
+  async getEarthquakeById(@Param("id", ParseIntPipe) id: number) {
+    return this.earthquakesService.getEarthquakeById(id);
   }
 }
