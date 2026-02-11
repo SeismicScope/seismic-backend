@@ -11,6 +11,7 @@ import { EarthquakesModule } from "./modules/earthquakes/earthquakes.module";
 import { HealthModule } from "./modules/health/health.module";
 import { ImportModule } from "./modules/import/import.module";
 import { MapModule } from "./modules/map/map.module";
+import { RedisModule } from "./modules/redis/redis.module";
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { MapModule } from "./modules/map/map.module";
       },
     }),
     PrismaModule,
+    RedisModule,
     HealthModule,
     ImportModule,
     EarthquakesModule,

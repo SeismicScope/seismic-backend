@@ -9,6 +9,7 @@ import {
   UseInterceptors,
 } from "@nestjs/common";
 import { FileInterceptor } from "@nestjs/platform-express";
+import { ApiConsumes, ApiOperation, ApiTags } from "@nestjs/swagger";
 import { diskStorage } from "multer";
 import { extname } from "path";
 
@@ -16,12 +17,15 @@ import { JwtGuard } from "../auth/guards/jwt.guard";
 import { RolesGuard } from "../auth/guards/roles.guard";
 import { ImportService } from "./import.service";
 
+@ApiTags("Import")
 @Controller("import")
 export class ImportController {
   constructor(private readonly importService: ImportService) {}
 
   @UseGuards(JwtGuard, RolesGuard)
   @Post("upload")
+  @ApiOperation({ summary: "Upload a CSV file for earthquake data import" })
+  @ApiConsumes("multipart/form-data")
   @UseInterceptors(
     FileInterceptor("file", {
       storage: diskStorage({
@@ -52,6 +56,7 @@ export class ImportController {
 
   @UseGuards(JwtGuard)
   @Get("status/:id")
+  @ApiOperation({ summary: "Get import job status by ID" })
   async getStatus(@Param("id", ParseIntPipe) id: number) {
     return this.importService.getImportStatus(id);
   }

@@ -1,14 +1,17 @@
 import { Controller, Get, Post, Req, Res, UseGuards } from "@nestjs/common";
+import { ApiOperation, ApiTags } from "@nestjs/swagger";
 import { Response } from "express";
 
 import { AuthService } from "./auth.service";
 import { JwtGuard } from "./guards/jwt.guard";
 
+@ApiTags("Auth")
 @Controller("auth")
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post("login")
+  @ApiOperation({ summary: "Login and receive access token cookie" })
   login(@Res({ passthrough: true }) res: Response) {
     const { access_token } = this.authService.login();
 
@@ -22,6 +25,7 @@ export class AuthController {
   }
 
   @Post("logout")
+  @ApiOperation({ summary: "Logout and clear access token cookie" })
   logout(@Res({ passthrough: true }) res: Response) {
     res.clearCookie("access_token", {
       httpOnly: true,
@@ -34,6 +38,7 @@ export class AuthController {
 
   @Get("me")
   @UseGuards(JwtGuard)
+  @ApiOperation({ summary: "Get current authenticated user" })
   getMe(@Req() req: Request) {
     return (req as any).user;
   }
