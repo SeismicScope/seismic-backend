@@ -1,4 +1,4 @@
-import { Controller, Get, Query } from "@nestjs/common";
+import { Controller, Get, Param, ParseIntPipe, Query } from "@nestjs/common";
 
 import { GetEarthquakesDto } from "./dto/get-earthquakes.dto";
 import { EarthquakesService } from "./earthquakes.service";
@@ -10,6 +10,11 @@ export class EarthquakesController {
   @Get()
   async getEarthquakes(@Query() query: GetEarthquakesDto) {
     return this.earthquakesService.getEarthquakes(query);
+  }
+
+  @Get(":id")
+  async getEarthquakeById(@Param("id", ParseIntPipe) id: number) {
+    return this.earthquakesService.getEarthquakeById(id);
   }
 
   @Get("magnitude-histogram")

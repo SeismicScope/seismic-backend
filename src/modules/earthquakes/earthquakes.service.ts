@@ -41,6 +41,10 @@ export class EarthquakesService {
     };
   }
 
+  async getEarthquakeById(id: number) {
+    return this.prisma.earthquake.findUnique({ where: { id } });
+  }
+
   async getEarthquakesMagnitudeHistogram(filters: GetEarthquakesDto) {
     const { sql, params } = buildEarthquakeWhereSql(filters);
 
