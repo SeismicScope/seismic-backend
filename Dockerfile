@@ -20,5 +20,7 @@ COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/prisma.config.ts ./
 
+COPY --from=builder /app/entrypoint.sh ./entrypoint.sh
+
 EXPOSE 8080
-CMD ["node", "dist/src/main.js"]
+CMD ["sh", "entrypoint.sh"]
