@@ -28,7 +28,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(payload: JwtPayload | null) {
+  async validate(payload?: JwtPayload | null) {
     if (!payload) {
       throw new UnauthorizedException();
     }

@@ -26,3 +26,13 @@ export type TransformedEarthquakeRow = {
   location: string;
   externalId: string;
 };
+
+export type MapEarthquake = {
+  id: number;
+  magnitude: number;
+  depth: number;
+  latitude: number;
+  longitude: number;
+  location: string | null;
+  occurredAt: Date;
+};

@@ -1,22 +1,14 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "prisma/prisma.service";
 
+import type { MapEarthquake } from "@/types";
+
 import { DB_EARTHQUAKE_NAME, SRID } from "../../constants";
 import { RedisService } from "../redis/redis.service";
 import { GetMapDto } from "./dto/get-map.dto";
 import { getLimitByZoom } from "./helpers";
 
 const MAP_TTL = 60; // 1 minute (map data changes with viewport)
-
-interface MapEarthquake {
-  id: number;
-  magnitude: number;
-  depth: number;
-  latitude: number;
-  longitude: number;
-  location: string | null;
-  occurredAt: Date;
-}
 
 @Injectable()
 export class MapService {
@@ -39,17 +31,7 @@ export class MapService {
     if (cached) return cached;
 
     const [data, countResult] = await Promise.all([
-      this.prisma.$queryRawUnsafe<
-        {
-          id: number;
-          magnitude: number;
-          depth: number;
-          latitude: number;
-          longitude: number;
-          location: string | null;
-          occurredAt: Date;
-        }[]
-      >(
+      this.prisma.$queryRawUnsafe<MapEarthquake[]>(
         `
         SELECT id, magnitude, depth, latitude, longitude, location, "occurredAt"
         FROM "${DB_EARTHQUAKE_NAME}"

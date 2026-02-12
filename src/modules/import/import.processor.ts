@@ -5,8 +5,10 @@ import csv from "csv-parser";
 import * as fs from "fs";
 import { PrismaService } from "prisma/prisma.service";
 
+import type { TransformedEarthquakeRow } from "@/types";
+
 import { DB_EARTHQUAKE_NAME, SRID } from "../../constants";
-import { type TransformedEarthquakeRow, transformRow } from "./helpers";
+import { transformRow } from "./helpers";
 
 const BATCH_SIZE = 5000;
 
