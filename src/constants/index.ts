@@ -17,3 +17,12 @@ export const SORT_MAP: Record<
   depth_asc: { depth: "asc" },
   depth_desc: { depth: "desc" },
 };
+
+export const SORT_OPTIONS = [
+  "date_asc",
+  "date_desc",
+  "magnitude_asc",
+  "magnitude_desc",
+  "depth_asc",
+  "depth_desc",
+] as const;
