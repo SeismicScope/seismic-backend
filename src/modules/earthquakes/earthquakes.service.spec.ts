@@ -2,6 +2,7 @@ import { Test, TestingModule } from "@nestjs/testing";
 import { PrismaService } from "prisma/prisma.service";
 
 import { RedisService } from "../redis/redis.service";
+import type { GetEarthquakesDto } from "./dto/get-earthquakes.dto";
 import { EarthquakesService } from "./earthquakes.service";
 
 describe("EarthquakesService", () => {
@@ -151,7 +152,7 @@ describe("EarthquakesService", () => {
       mockPrisma.earthquake.findMany.mockResolvedValue([]);
       mockPrisma.earthquake.count.mockResolvedValue(0);
 
-      await service.getEarthquakes({} as any);
+      await service.getEarthquakes({} as unknown as GetEarthquakesDto);
 
       expect(mockPrisma.earthquake.findMany).toHaveBeenCalledWith(
         expect.objectContaining({

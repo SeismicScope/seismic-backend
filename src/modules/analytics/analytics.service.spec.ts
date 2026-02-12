@@ -3,6 +3,7 @@ import { PrismaService } from "prisma/prisma.service";
 
 import { RedisService } from "../redis/redis.service";
 import { AnalyticsService } from "./analytics.service";
+import type { TimeInterval } from "./dto/time-series.dto";
 
 describe("AnalyticsService", () => {
   let service: AnalyticsService;
@@ -146,7 +147,7 @@ describe("AnalyticsService", () => {
       mockRedis.get.mockResolvedValue(null);
 
       await expect(
-        service.timeSeries({ interval: "invalid" as any }),
+        service.timeSeries({ interval: "invalid" as unknown as TimeInterval }),
       ).rejects.toThrow("Invalid interval");
     });
 

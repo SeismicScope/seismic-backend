@@ -1,3 +1,4 @@
+import { Job } from "bullmq";
 import * as fs from "fs";
 import * as os from "os";
 import * as path from "path";
@@ -20,7 +21,9 @@ describe("ImportProcessor", () => {
     importJob: {
       update: jest.fn().mockResolvedValue({}),
     },
-    $transaction: jest.fn((cb: any) => cb(mockTx)),
+    $transaction: jest.fn((cb: (tx: typeof mockTx) => Promise<void>) =>
+      cb(mockTx),
+    ),
   };
 
   beforeEach(() => {
@@ -43,7 +46,10 @@ describe("ImportProcessor", () => {
   }
 
   function createMockJob(filePath: string, jobId = 1) {
-    return { data: { filePath, jobId } } as any;
+    return { data: { filePath, jobId } } as unknown as Job<{
+      filePath: string;
+      jobId: number;
+    }>;
   }
 
   it("should throw error when file does not exist", async () => {

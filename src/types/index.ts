@@ -6,3 +6,23 @@ export type EarthquakeFilterParams = {
   dateFrom?: Date;
   dateTo?: Date;
 };
+
+export type CsvRow = {
+  time: string;
+  latitude: string;
+  longitude: string;
+  id: string;
+  mag: string;
+  depth: string;
+  location: string;
+};
+
+export type TransformedEarthquakeRow = {
+  occurredAt: Date;
+  magnitude: number;
+  depth: number;
+  latitude: number;
+  longitude: number;
+  location: string;
+  externalId: string;
+};

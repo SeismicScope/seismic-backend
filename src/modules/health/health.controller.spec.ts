@@ -1,3 +1,4 @@
+import { ServiceUnavailableException } from "@nestjs/common";
 import { Test, TestingModule } from "@nestjs/testing";
 import { PrismaService } from "prisma/prisma.service";
 
@@ -41,8 +42,10 @@ describe("HealthController", () => {
       try {
         await controller.check();
         fail("Expected ServiceUnavailableException");
-      } catch (error: any) {
-        const response = error.getResponse();
+      } catch (error) {
+        const response = (
+          error as ServiceUnavailableException
+        ).getResponse() as Record<string, unknown>;
         expect(response.status).toBe("error");
         expect(response.db).toBe("disconnected");
         expect(response.uptime).toBeDefined();

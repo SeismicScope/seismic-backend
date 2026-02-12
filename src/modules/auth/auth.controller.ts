@@ -1,9 +1,10 @@
 import { Controller, Get, Post, Req, Res, UseGuards } from "@nestjs/common";
 import { ApiOperation, ApiTags } from "@nestjs/swagger";
-import { Response } from "express";
+import { Request, Response } from "express";
 
 import { AuthService } from "./auth.service";
 import { JwtGuard } from "./guards/jwt.guard";
+import type { JwtPayload } from "./types";
 
 @ApiTags("Auth")
 @Controller("auth")
@@ -39,7 +40,7 @@ export class AuthController {
   @Get("me")
   @UseGuards(JwtGuard)
   @ApiOperation({ summary: "Get current authenticated user" })
-  getMe(@Req() req: Request) {
-    return (req as any).user;
+  getMe(@Req() req: Request & { user: JwtPayload }) {
+    return req.user;
   }
 }

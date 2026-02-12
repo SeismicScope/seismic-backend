@@ -1,4 +1,6 @@
-export function transformRow(row: any) {
+import type { CsvRow, TransformedEarthquakeRow } from "@/types";
+
+export function transformRow(row: CsvRow): TransformedEarthquakeRow | null {
   const date = new Date(row.time);
   const latitude = parseFloat(row.latitude);
   const longitude = parseFloat(row.longitude);

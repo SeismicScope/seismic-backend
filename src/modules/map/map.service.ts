@@ -8,6 +8,16 @@ import { getLimitByZoom } from "./helpers";
 
 const MAP_TTL = 60; // 1 minute (map data changes with viewport)
 
+interface MapEarthquake {
+  id: number;
+  magnitude: number;
+  depth: number;
+  latitude: number;
+  longitude: number;
+  location: string | null;
+  occurredAt: Date;
+}
+
 @Injectable()
 export class MapService {
   constructor(
@@ -21,7 +31,7 @@ export class MapService {
 
     const cacheKey = `map:${west}:${south}:${east}:${north}:${zoom}`;
     const cached = await this.redis.get<{
-      data: any[];
+      data: MapEarthquake[];
       total: number;
       limit: number;
     }>(cacheKey);

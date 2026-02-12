@@ -1,7 +1,9 @@
 import { Test, TestingModule } from "@nestjs/testing";
+import { Request, Response } from "express";
 
 import { AuthController } from "./auth.controller";
 import { AuthService } from "./auth.service";
+import type { JwtPayload } from "./types";
 
 describe("AuthController", () => {
   let controller: AuthController;
@@ -27,7 +29,7 @@ describe("AuthController", () => {
 
       const mockRes = {
         cookie: jest.fn(),
-      } as any;
+      } as unknown as Response;
 
       const result = controller.login(mockRes);
 
@@ -47,7 +49,7 @@ describe("AuthController", () => {
     it("should clear cookie and return success", () => {
       const mockRes = {
         clearCookie: jest.fn(),
-      } as any;
+      } as unknown as Response;
 
       const result = controller.logout(mockRes);
 
@@ -66,7 +68,7 @@ describe("AuthController", () => {
     it("should return user from request", () => {
       const mockReq = {
         user: { name: "Admin", role: "admin" },
-      } as any;
+      } as unknown as Request & { user: JwtPayload };
 
       const result = controller.getMe(mockReq);
 

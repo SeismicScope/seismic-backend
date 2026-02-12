@@ -1,5 +1,6 @@
 import { ExecutionContext } from "@nestjs/common";
 
+import type { JwtPayload } from "../types";
 import { RolesGuard } from "./roles.guard";
 
 describe("RolesGuard", () => {
@@ -9,7 +10,9 @@ describe("RolesGuard", () => {
     guard = new RolesGuard();
   });
 
-  function createMockContext(user: any): ExecutionContext {
+  function createMockContext(
+    user?: Partial<JwtPayload> | null,
+  ): ExecutionContext {
     return {
       switchToHttp: () => ({
         getRequest: () => ({ user }),

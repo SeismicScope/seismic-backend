@@ -6,7 +6,7 @@ import * as fs from "fs";
 import { PrismaService } from "prisma/prisma.service";
 
 import { DB_EARTHQUAKE_NAME, SRID } from "../../constants";
-import { transformRow } from "./helpers";
+import { type TransformedEarthquakeRow, transformRow } from "./helpers";
 
 const BATCH_SIZE = 5000;
 
@@ -36,7 +36,7 @@ export class ImportProcessor extends WorkerHost {
       }),
     );
 
-    let batch: any[] = [];
+    let batch: TransformedEarthquakeRow[] = [];
     let processedCount = 0;
 
     await this.prisma.importJob.update({
@@ -114,7 +114,7 @@ export class ImportProcessor extends WorkerHost {
     jobId,
     currentTotal,
   }: {
-    batch: any[];
+    batch: TransformedEarthquakeRow[];
     jobId: number;
     currentTotal: number;
   }) {
