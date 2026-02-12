@@ -124,3 +124,66 @@ Docker Compose services:
   postgres    postgis/postgis:15-3.4
   redis       redis:7
 ```
+
+## Production Architecture
+
+The application is deployed on a hardened Ubuntu 24.04 LTS DigitalOcean Droplet using Docker-based service isolation and Nginx as a reverse proxy.
+
+### Infrastructure
+
+- Dockerized services: Backend, PostgreSQL (PostGIS), Redis
+- Nginx reverse proxy
+- HTTPS via Let's Encrypt (auto-renew enabled)
+- CI/CD via GitHub Actions
+
+### Network & Isolation
+
+Only the following ports are exposed:
+
+- 22 (SSH)
+- 80 (HTTP)
+- 443 (HTTPS)
+
+Internal services are not publicly accessible:
+
+- PostgreSQL runs inside Docker (no external exposure)
+- Redis runs inside Docker (no external exposure)
+- Backend is bound to `127.0.0.1`
+- All external traffic flows through Nginx
+
+```
+Client
+↓ HTTPS
+Nginx (80/443)
+↓
+Backend (127.0.0.1:8080, Docker)
+↓
+PostgreSQL + Redis (internal network)
+```
+
+### Security
+
+- Root SSH login disabled
+- Password authentication disabled (SSH key only)
+- UFW firewall enabled
+- HttpOnly authentication cookies
+- CORS restricted to frontend domain
+
+### Performance
+
+- Gzip compression enabled at Nginx level
+- Optimized for large JSON responses
+- Configured `client_max_body_size` (100MB) for CSV imports
+- Extended proxy timeouts for long-running import jobs
+
+### Deployment Flow
+
+Push to `main` triggers:
+
+1. Unit tests + coverage
+2. SSH deployment
+3. Docker rebuild
+4. `prisma migrate deploy`
+5. Image pruning
+
+No manual production changes.
