@@ -20,6 +20,8 @@ async function bootstrap() {
 
   const logger = app.get(WINSTON_MODULE_NEST_PROVIDER);
 
+  app.setGlobalPrefix("api/v1");
+
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true,
@@ -43,7 +45,7 @@ async function bootstrap() {
     .build();
 
   const document = SwaggerModule.createDocument(app, swaggerConfig);
-  SwaggerModule.setup("api/docs", app, document);
+  SwaggerModule.setup("api/v1/docs", app, document);
 
   app.useGlobalInterceptors(new LoggingInterceptor());
   app.useGlobalFilters(new GlobalExceptionFilter());
