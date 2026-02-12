@@ -8,7 +8,7 @@ describe("HealthController", () => {
   let controller: HealthController;
 
   const mockPrisma = {
-    $queryRawUnsafe: jest.fn(),
+    $queryRaw: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -24,7 +24,7 @@ describe("HealthController", () => {
 
   describe("check", () => {
     it("should return ok status when DB is connected", async () => {
-      mockPrisma.$queryRawUnsafe.mockResolvedValue([{ "?column?": 1 }]);
+      mockPrisma.$queryRaw.mockResolvedValue([{ "?column?": 1 }]);
 
       const result = await controller.check();
 
@@ -35,9 +35,7 @@ describe("HealthController", () => {
     });
 
     it("should return error status when DB query fails", async () => {
-      mockPrisma.$queryRawUnsafe.mockRejectedValue(
-        new Error("Connection refused"),
-      );
+      mockPrisma.$queryRaw.mockRejectedValue(new Error("Connection refused"));
 
       try {
         await controller.check();
@@ -54,7 +52,7 @@ describe("HealthController", () => {
     });
 
     it("should return valid ISO timestamp", async () => {
-      mockPrisma.$queryRawUnsafe.mockResolvedValue([{ "?column?": 1 }]);
+      mockPrisma.$queryRaw.mockResolvedValue([{ "?column?": 1 }]);
 
       const result = await controller.check();
 
@@ -63,7 +61,7 @@ describe("HealthController", () => {
     });
 
     it("should return numeric uptime", async () => {
-      mockPrisma.$queryRawUnsafe.mockResolvedValue([{ "?column?": 1 }]);
+      mockPrisma.$queryRaw.mockResolvedValue([{ "?column?": 1 }]);
 
       const result = await controller.check();
 

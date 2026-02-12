@@ -1,4 +1,4 @@
-import type { Prisma } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 
 import type { EarthquakeFilterParams } from "@/types";
 
@@ -22,37 +22,31 @@ export function buildEarthquakeWhere(
   return where;
 }
 
-export function buildEarthquakeWhereSql(filters: EarthquakeFilterParams) {
-  const conditions: string[] = [];
-  const params: (number | Date)[] = [];
-  let idx = 1;
+export function buildEarthquakeWhereSql(
+  filters: EarthquakeFilterParams,
+): Prisma.Sql {
+  const conditions: Prisma.Sql[] = [];
 
   if (filters.minMag !== undefined) {
-    conditions.push(`magnitude >= $${idx++}`);
-    params.push(filters.minMag);
+    conditions.push(Prisma.sql`magnitude >= ${filters.minMag}`);
   }
   if (filters.maxMag !== undefined) {
-    conditions.push(`magnitude <= $${idx++}`);
-    params.push(filters.maxMag);
+    conditions.push(Prisma.sql`magnitude <= ${filters.maxMag}`);
   }
   if (filters.minDepth !== undefined) {
-    conditions.push(`depth >= $${idx++}`);
-    params.push(filters.minDepth);
+    conditions.push(Prisma.sql`depth >= ${filters.minDepth}`);
   }
   if (filters.maxDepth !== undefined) {
-    conditions.push(`depth <= $${idx++}`);
-    params.push(filters.maxDepth);
+    conditions.push(Prisma.sql`depth <= ${filters.maxDepth}`);
   }
   if (filters.dateFrom) {
-    conditions.push(`"occurredAt" >= $${idx++}`);
-    params.push(filters.dateFrom);
+    conditions.push(Prisma.sql`"occurredAt" >= ${filters.dateFrom}`);
   }
   if (filters.dateTo) {
-    conditions.push(`"occurredAt" <= $${idx++}`);
-    params.push(filters.dateTo);
+    conditions.push(Prisma.sql`"occurredAt" <= ${filters.dateTo}`);
   }
 
-  const sql = conditions.length > 0 ? `AND ${conditions.join(" AND ")}` : "";
+  if (conditions.length === 0) return Prisma.empty;
 
-  return { sql, params };
+  return Prisma.sql`AND ${Prisma.join(conditions, " AND ")}`;
 }

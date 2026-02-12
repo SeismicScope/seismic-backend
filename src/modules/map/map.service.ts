@@ -1,4 +1,5 @@
 import { Injectable } from "@nestjs/common";
+import { Prisma } from "@prisma/client";
 import { PrismaService } from "prisma/prisma.service";
 
 import type { MapEarthquake } from "@/types";
@@ -30,33 +31,20 @@ export class MapService {
 
     if (cached) return cached;
 
+    const tableName = Prisma.raw(`"${DB_EARTHQUAKE_NAME}"`);
+
     const [data, countResult] = await Promise.all([
-      this.prisma.$queryRawUnsafe<MapEarthquake[]>(
-        `
+      this.prisma.$queryRaw<MapEarthquake[]>(Prisma.sql`
         SELECT id, magnitude, depth, latitude, longitude, location, "occurredAt"
-        FROM "${DB_EARTHQUAKE_NAME}"
-        WHERE geom && ST_MakeEnvelope($1, $2, $3, $4, $5)
-        LIMIT $6;
-      `,
-        west,
-        south,
-        east,
-        north,
-        SRID,
-        limit,
-      ),
-      this.prisma.$queryRawUnsafe<[{ count: bigint }]>(
-        `
+        FROM ${tableName}
+        WHERE geom && ST_MakeEnvelope(${west}, ${south}, ${east}, ${north}, ${SRID})
+        LIMIT ${limit}
+      `),
+      this.prisma.$queryRaw<[{ count: bigint }]>(Prisma.sql`
         SELECT COUNT(*) as count
-        FROM "${DB_EARTHQUAKE_NAME}"
-        WHERE geom && ST_MakeEnvelope($1, $2, $3, $4, $5);
-      `,
-        west,
-        south,
-        east,
-        north,
-        SRID,
-      ),
+        FROM ${tableName}
+        WHERE geom && ST_MakeEnvelope(${west}, ${south}, ${east}, ${north}, ${SRID})
+      `),
     ]);
 
     const result = {

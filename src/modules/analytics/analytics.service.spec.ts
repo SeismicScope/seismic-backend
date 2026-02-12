@@ -12,7 +12,7 @@ describe("AnalyticsService", () => {
     earthquake: {
       aggregate: jest.fn(),
     },
-    $queryRawUnsafe: jest.fn(),
+    $queryRaw: jest.fn(),
   };
 
   const mockRedis = {
@@ -134,7 +134,7 @@ describe("AnalyticsService", () => {
     it("should return formatted time-series data", async () => {
       mockRedis.get.mockResolvedValue(null);
       const mockDate = new Date("2023-01-01");
-      mockPrisma.$queryRawUnsafe.mockResolvedValue([
+      mockPrisma.$queryRaw.mockResolvedValue([
         { date: mockDate, count: BigInt(500) },
       ]);
 
@@ -153,15 +153,12 @@ describe("AnalyticsService", () => {
 
     it("should pass trunc as parameterized value", async () => {
       mockRedis.get.mockResolvedValue(null);
-      mockPrisma.$queryRawUnsafe.mockResolvedValue([]);
+      mockPrisma.$queryRaw.mockResolvedValue([]);
 
       await service.timeSeries({ interval: "year" });
 
-      const lastParam =
-        mockPrisma.$queryRawUnsafe.mock.calls[0][
-          mockPrisma.$queryRawUnsafe.mock.calls[0].length - 1
-        ];
-      expect(lastParam).toBe("year");
+      const sqlArg = mockPrisma.$queryRaw.mock.calls[0][0];
+      expect(sqlArg.values).toContain("year");
     });
 
     it("should return cached time-series when available", async () => {
@@ -174,13 +171,13 @@ describe("AnalyticsService", () => {
       const result = await service.timeSeries({ interval: "month" });
 
       expect(result).toEqual(cachedData);
-      expect(mockPrisma.$queryRawUnsafe).not.toHaveBeenCalled();
+      expect(mockPrisma.$queryRaw).not.toHaveBeenCalled();
     });
 
     it("should cache time-series after fetching from DB", async () => {
       mockRedis.get.mockResolvedValue(null);
       const mockDate = new Date("2023-01-01");
-      mockPrisma.$queryRawUnsafe.mockResolvedValue([
+      mockPrisma.$queryRaw.mockResolvedValue([
         { date: mockDate, count: BigInt(300) },
       ]);
 
@@ -199,7 +196,7 @@ describe("AnalyticsService", () => {
       const date2 = new Date("2023-02-01");
       const date3 = new Date("2023-03-01");
 
-      mockPrisma.$queryRawUnsafe.mockResolvedValue([
+      mockPrisma.$queryRaw.mockResolvedValue([
         { date: date1, count: BigInt(100) },
         { date: date2, count: BigInt(200) },
         { date: date3, count: BigInt(50) },
@@ -214,7 +211,7 @@ describe("AnalyticsService", () => {
 
     it("should handle empty time-series result", async () => {
       mockRedis.get.mockResolvedValue(null);
-      mockPrisma.$queryRawUnsafe.mockResolvedValue([]);
+      mockPrisma.$queryRaw.mockResolvedValue([]);
 
       const result = await service.timeSeries({ interval: "week" });
 

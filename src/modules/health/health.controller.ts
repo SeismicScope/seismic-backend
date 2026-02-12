@@ -14,7 +14,7 @@ export class HealthController {
   @ApiOkResponse({ type: HealthResponseDto })
   async check() {
     try {
-      await this.prisma.$queryRawUnsafe("SELECT 1");
+      await this.prisma.$queryRaw`SELECT 1`;
 
       return {
         status: "ok",

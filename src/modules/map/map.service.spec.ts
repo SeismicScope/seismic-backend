@@ -8,7 +8,7 @@ describe("MapService", () => {
   let service: MapService;
 
   const mockPrisma = {
-    $queryRawUnsafe: jest.fn(),
+    $queryRaw: jest.fn(),
   };
 
   const mockRedis = {
@@ -53,7 +53,7 @@ describe("MapService", () => {
           occurredAt: new Date(),
         },
       ];
-      mockPrisma.$queryRawUnsafe
+      mockPrisma.$queryRaw
         .mockResolvedValueOnce(mockData)
         .mockResolvedValueOnce([{ count: BigInt(500) }]);
 
@@ -66,7 +66,7 @@ describe("MapService", () => {
 
     it("should use zoom-based limit for low zoom", async () => {
       mockRedis.get.mockResolvedValue(null);
-      mockPrisma.$queryRawUnsafe
+      mockPrisma.$queryRaw
         .mockResolvedValueOnce([])
         .mockResolvedValueOnce([{ count: BigInt(0) }]);
 
@@ -86,12 +86,12 @@ describe("MapService", () => {
       const result = await service.getMap(defaultDto);
 
       expect(result).toEqual(cachedResult);
-      expect(mockPrisma.$queryRawUnsafe).not.toHaveBeenCalled();
+      expect(mockPrisma.$queryRaw).not.toHaveBeenCalled();
     });
 
     it("should cache result after fetching from DB", async () => {
       mockRedis.get.mockResolvedValue(null);
-      mockPrisma.$queryRawUnsafe
+      mockPrisma.$queryRaw
         .mockResolvedValueOnce([{ id: 1 }])
         .mockResolvedValueOnce([{ count: BigInt(1) }]);
 
@@ -110,7 +110,7 @@ describe("MapService", () => {
 
     it("should build correct cache key from bounds and zoom", async () => {
       mockRedis.get.mockResolvedValue(null);
-      mockPrisma.$queryRawUnsafe
+      mockPrisma.$queryRaw
         .mockResolvedValueOnce([])
         .mockResolvedValueOnce([{ count: BigInt(0) }]);
 
@@ -122,7 +122,7 @@ describe("MapService", () => {
 
     it("should handle large total count", async () => {
       mockRedis.get.mockResolvedValue(null);
-      mockPrisma.$queryRawUnsafe
+      mockPrisma.$queryRaw
         .mockResolvedValueOnce([])
         .mockResolvedValueOnce([{ count: BigInt(1_000_000) }]);
 
@@ -133,19 +133,19 @@ describe("MapService", () => {
 
     it("should pass SRID 4326 to spatial query", async () => {
       mockRedis.get.mockResolvedValue(null);
-      mockPrisma.$queryRawUnsafe
+      mockPrisma.$queryRaw
         .mockResolvedValueOnce([])
         .mockResolvedValueOnce([{ count: BigInt(0) }]);
 
       await service.getMap(defaultDto);
 
-      const dataCall = mockPrisma.$queryRawUnsafe.mock.calls[0];
-      expect(dataCall[5]).toBe(4326);
+      const sqlArg = mockPrisma.$queryRaw.mock.calls[0][0];
+      expect(sqlArg.values).toContain(4326);
     });
 
     it("should pass bounds as parameters", async () => {
       mockRedis.get.mockResolvedValue(null);
-      mockPrisma.$queryRawUnsafe
+      mockPrisma.$queryRaw
         .mockResolvedValueOnce([])
         .mockResolvedValueOnce([{ count: BigInt(0) }]);
 
@@ -157,16 +157,13 @@ describe("MapService", () => {
         zoom: 5,
       });
 
-      const dataCall = mockPrisma.$queryRawUnsafe.mock.calls[0];
-      expect(dataCall[1]).toBe(10);
-      expect(dataCall[2]).toBe(20);
-      expect(dataCall[3]).toBe(30);
-      expect(dataCall[4]).toBe(40);
+      const sqlArg = mockPrisma.$queryRaw.mock.calls[0][0];
+      expect(sqlArg.values).toEqual(expect.arrayContaining([10, 20, 30, 40]));
     });
 
     it("should return max limit (200k) for zoom > 8", async () => {
       mockRedis.get.mockResolvedValue(null);
-      mockPrisma.$queryRawUnsafe
+      mockPrisma.$queryRaw
         .mockResolvedValueOnce([])
         .mockResolvedValueOnce([{ count: BigInt(0) }]);
 

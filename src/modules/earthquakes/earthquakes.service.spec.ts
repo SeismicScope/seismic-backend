@@ -14,7 +14,7 @@ describe("EarthquakesService", () => {
       findUnique: jest.fn(),
       count: jest.fn(),
     },
-    $queryRawUnsafe: jest.fn(),
+    $queryRaw: jest.fn(),
   };
 
   const mockRedis = {
@@ -207,7 +207,7 @@ describe("EarthquakesService", () => {
   describe("getEarthquakesMagnitudeHistogram", () => {
     it("should return formatted histogram data", async () => {
       mockRedis.get.mockResolvedValue(null);
-      mockPrisma.$queryRawUnsafe.mockResolvedValue([
+      mockPrisma.$queryRaw.mockResolvedValue([
         { bin: 2.0, count: BigInt(150) },
         { bin: 3.5, count: BigInt(300) },
         { bin: 5.0, count: BigInt(50) },
@@ -236,12 +236,12 @@ describe("EarthquakesService", () => {
       });
 
       expect(result).toEqual(cachedHistogram);
-      expect(mockPrisma.$queryRawUnsafe).not.toHaveBeenCalled();
+      expect(mockPrisma.$queryRaw).not.toHaveBeenCalled();
     });
 
     it("should cache histogram after fetching from DB", async () => {
       mockRedis.get.mockResolvedValue(null);
-      mockPrisma.$queryRawUnsafe.mockResolvedValue([
+      mockPrisma.$queryRaw.mockResolvedValue([
         { bin: 4.0, count: BigInt(100) },
       ]);
 
@@ -256,7 +256,7 @@ describe("EarthquakesService", () => {
 
     it("should handle empty histogram result", async () => {
       mockRedis.get.mockResolvedValue(null);
-      mockPrisma.$queryRawUnsafe.mockResolvedValue([]);
+      mockPrisma.$queryRaw.mockResolvedValue([]);
 
       const result = await service.getEarthquakesMagnitudeHistogram({
         limit: 50,
@@ -267,7 +267,7 @@ describe("EarthquakesService", () => {
 
     it("should build correct cache key from filters", async () => {
       mockRedis.get.mockResolvedValue(null);
-      mockPrisma.$queryRawUnsafe.mockResolvedValue([]);
+      mockPrisma.$queryRaw.mockResolvedValue([]);
 
       const filters = { limit: 50, minDepth: 10, maxDepth: 100 };
       await service.getEarthquakesMagnitudeHistogram(filters);

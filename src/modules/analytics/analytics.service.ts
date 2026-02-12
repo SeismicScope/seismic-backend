@@ -1,4 +1,5 @@
 import { Injectable } from "@nestjs/common";
+import { Prisma } from "@prisma/client";
 import { PrismaService } from "prisma/prisma.service";
 
 import { DB_EARTHQUAKE_NAME } from "@/constants";
@@ -29,31 +30,27 @@ export class AnalyticsService {
 
     if (cached) return cached;
 
-    const { sql, params } = buildEarthquakeWhereSql(filters);
+    const whereSql = buildEarthquakeWhereSql(filters);
     const trunc = PG_INTERVALS[filters.interval];
 
     if (!trunc) {
       throw new Error(`Invalid interval: ${filters.interval}`);
     }
 
-    const idx = params.length + 1;
+    const tableName = Prisma.raw(`"${DB_EARTHQUAKE_NAME}"`);
 
-    const rows = await this.prisma.$queryRawUnsafe<
+    const rows = await this.prisma.$queryRaw<
       { date: Date; count: bigint }[]
-    >(
-      `
+    >(Prisma.sql`
       SELECT
-        DATE_TRUNC($${idx}, "occurredAt") as date,
+        DATE_TRUNC(${trunc}, "occurredAt") as date,
         COUNT(*) as count
-      FROM "${DB_EARTHQUAKE_NAME}"
+      FROM ${tableName}
       WHERE 1=1
-      ${sql}
+      ${whereSql}
       GROUP BY date
       ORDER BY date ASC
-    `,
-      ...params,
-      trunc,
-    );
+    `);
 
     const result = rows.map((r) => ({
       date: r.date,

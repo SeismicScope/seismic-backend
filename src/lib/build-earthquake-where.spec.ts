@@ -1,3 +1,5 @@
+import { Prisma } from "@prisma/client";
+
 import {
   buildEarthquakeWhere,
   buildEarthquakeWhereSql,
@@ -52,23 +54,19 @@ describe("buildEarthquakeWhere", () => {
 });
 
 describe("buildEarthquakeWhereSql", () => {
-  it("should return empty sql and params when no filters", () => {
+  it("should return Prisma.empty when no filters", () => {
     const result = buildEarthquakeWhereSql({});
-    expect(result.sql).toBe("");
-    expect(result.params).toEqual([]);
+    expect(result).toBe(Prisma.empty);
   });
 
   it("should build SQL for minMag", () => {
     const result = buildEarthquakeWhereSql({ minMag: 3 });
-    expect(result.sql).toContain("magnitude >= $1");
-    expect(result.params).toEqual([3]);
+    expect(result.values).toEqual([3]);
   });
 
   it("should build SQL for multiple filters", () => {
     const result = buildEarthquakeWhereSql({ minMag: 3, maxMag: 7 });
-    expect(result.sql).toContain("magnitude >= $1");
-    expect(result.sql).toContain("magnitude <= $2");
-    expect(result.params).toEqual([3, 7]);
+    expect(result.values).toEqual([3, 7]);
   });
 
   it("should build SQL for all filters", () => {
@@ -83,19 +81,16 @@ describe("buildEarthquakeWhereSql", () => {
       dateTo,
     });
 
-    expect(result.params).toHaveLength(6);
-    expect(result.sql).toContain("AND");
-    expect(result.params).toEqual([2, 8, 0, 100, dateFrom, dateTo]);
+    expect(result.values).toHaveLength(6);
+    expect(result.values).toEqual([2, 8, 0, 100, dateFrom, dateTo]);
   });
 
-  it("should use correct parameter indices", () => {
+  it("should parameterize depth filters", () => {
     const result = buildEarthquakeWhereSql({
       minDepth: 10,
       maxDepth: 50,
     });
 
-    expect(result.sql).toContain("depth >= $1");
-    expect(result.sql).toContain("depth <= $2");
-    expect(result.params).toEqual([10, 50]);
+    expect(result.values).toEqual([10, 50]);
   });
 });

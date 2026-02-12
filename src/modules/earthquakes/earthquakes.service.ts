@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import type { Prisma } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { PrismaService } from "prisma/prisma.service";
 
 import { DB_EARTHQUAKE_NAME, SORT_MAP } from "@/constants";
@@ -73,23 +73,21 @@ export class EarthquakesService {
 
     if (cached) return cached;
 
-    const { sql, params } = buildEarthquakeWhereSql(filters);
+    const whereSql = buildEarthquakeWhereSql(filters);
+    const tableName = Prisma.raw(`"${DB_EARTHQUAKE_NAME}"`);
 
-    const stats = await this.prisma.$queryRawUnsafe<
+    const stats = await this.prisma.$queryRaw<
       { bin: number; count: bigint }[]
-    >(
-      `
+    >(Prisma.sql`
       SELECT
         FLOOR(magnitude * 10) / 10 as bin,
         COUNT(*) as count
-      FROM "${DB_EARTHQUAKE_NAME}"
+      FROM ${tableName}
       WHERE magnitude IS NOT NULL
-      ${sql}
+      ${whereSql}
       GROUP BY bin
       ORDER BY bin ASC
-    `,
-      ...params,
-    );
+    `);
 
     const result = stats.map((s) => ({
       magnitude: Number(Number(s.bin).toFixed(1)),
