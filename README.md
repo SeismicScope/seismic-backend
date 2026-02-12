@@ -116,7 +116,7 @@ npm run test:cov      # coverage report
 
 ## Deployment
 
-GitHub Actions: push to `main` → run tests → SSH to Droplet → `docker compose up -d --build` → `prisma db push`.
+GitHub Actions: push to `main` → run tests → SSH to Droplet → `docker compose up -d --build` → `prisma migrate deploy`
 
 ```
 Docker Compose services:
