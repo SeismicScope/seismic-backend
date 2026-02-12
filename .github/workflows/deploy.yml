@@ -47,8 +47,7 @@ jobs:
           script: |
             cd ~/seismic-backend
             git pull origin main
-            docker compose down
-            docker compose build
-            docker compose up -d seismic_db seismic_redis
-            docker compose up -d backend
+            docker compose down --rmi all
+            docker compose build --no-cache
+            docker compose up -d
             docker image prune -f
