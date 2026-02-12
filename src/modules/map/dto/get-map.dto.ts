@@ -5,22 +5,22 @@ export class GetMapDto {
   @IsDefined({ message: "West is required" })
   @Type(() => Number)
   @IsNumber()
-  west?: number;
+  west!: number;
 
   @IsDefined({ message: "South is required" })
   @Type(() => Number)
   @IsNumber()
-  south?: number;
+  south!: number;
 
   @IsDefined({ message: "East is required" })
   @Type(() => Number)
   @IsNumber()
-  east?: number;
+  east!: number;
 
   @IsDefined({ message: "North is required" })
   @Type(() => Number)
   @IsNumber()
-  north?: number;
+  north!: number;
 
   @IsOptional()
   @Type(() => Number)
