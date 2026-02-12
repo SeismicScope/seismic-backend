@@ -11,16 +11,17 @@ services:
     env_file:
       - .env
     environment:
-      DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
-      REDIS_HOST: redis
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@seismic_db:5432/${POSTGRES_DB}
+      REDIS_HOST: seismic_redis
       REDIS_PORT: 6379
     depends_on:
-      - postgres
-      - redis
+      - seismic_db
+      - seismic_redis
 
-  postgres:
+  seismic_db:
     image: postgis/postgis:15-3.4
     container_name: seismic_db
+    shm_size: "512mb"
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -30,7 +31,7 @@ services:
     volumes:
       - db_data:/var/lib/postgresql/data
 
-  redis:
+  seismic_redis:
     image: redis:7
     container_name: seismic_redis
     ports:
