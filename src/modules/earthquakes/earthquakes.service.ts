@@ -9,7 +9,18 @@ import {
 } from "@/lib/build-earthquake-where";
 
 import { RedisService } from "../redis/redis.service";
+import type { EarthquakeResponseDto } from "./dto/earthquake-response.dto";
 import type { GetEarthquakesDto } from "./dto/get-earthquakes.dto";
+
+const EARTHQUAKE_SELECT = {
+  id: true,
+  occurredAt: true,
+  magnitude: true,
+  depth: true,
+  latitude: true,
+  longitude: true,
+  location: true,
+} as const;
 
 const HISTOGRAM_TTL = 300; // 5 minutes
 
@@ -29,6 +40,7 @@ export class EarthquakesService {
 
     const [data, total] = await Promise.all([
       this.prisma.earthquake.findMany({
+        select: EARTHQUAKE_SELECT,
         where,
         take: limit,
         skip: cursor ? 1 : 0,
@@ -47,8 +59,11 @@ export class EarthquakesService {
     };
   }
 
-  async getEarthquakeById(id: number) {
-    return this.prisma.earthquake.findUnique({ where: { id } });
+  async getEarthquakeById(id: number): Promise<EarthquakeResponseDto | null> {
+    return this.prisma.earthquake.findUnique({
+      select: EARTHQUAKE_SELECT,
+      where: { id },
+    });
   }
 
   async getEarthquakesMagnitudeHistogram(filters: GetEarthquakesDto) {

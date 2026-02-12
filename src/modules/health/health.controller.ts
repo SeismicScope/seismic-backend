@@ -1,6 +1,8 @@
 import { Controller, Get, ServiceUnavailableException } from "@nestjs/common";
-import { ApiOperation, ApiTags } from "@nestjs/swagger";
+import { ApiOkResponse, ApiOperation, ApiTags } from "@nestjs/swagger";
 import { PrismaService } from "prisma/prisma.service";
+
+import { HealthResponseDto } from "./dto/health-response.dto";
 
 @ApiTags("Health")
 @Controller("health")
@@ -9,6 +11,7 @@ export class HealthController {
 
   @Get()
   @ApiOperation({ summary: "Check API and database health status" })
+  @ApiOkResponse({ type: HealthResponseDto })
   async check() {
     try {
       await this.prisma.$queryRawUnsafe("SELECT 1");

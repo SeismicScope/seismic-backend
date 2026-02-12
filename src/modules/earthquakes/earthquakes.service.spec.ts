@@ -182,6 +182,15 @@ describe("EarthquakesService", () => {
 
       expect(result).toEqual(mockEarthquake);
       expect(mockPrisma.earthquake.findUnique).toHaveBeenCalledWith({
+        select: {
+          id: true,
+          occurredAt: true,
+          magnitude: true,
+          depth: true,
+          latitude: true,
+          longitude: true,
+          location: true,
+        },
         where: { id: 1 },
       });
     });
