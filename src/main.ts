@@ -8,7 +8,8 @@ import cookieParser from "cookie-parser";
 import { WINSTON_MODULE_NEST_PROVIDER } from "nest-winston";
 
 import { AppModule } from "./app.module";
-import { LoggingInterceptor } from "./lib/logging.interceptor";
+import { GlobalExceptionFilter } from "./shared/global-exception.filter";
+import { LoggingInterceptor } from "./shared/logging.interceptor";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -45,6 +46,7 @@ async function bootstrap() {
   SwaggerModule.setup("api/docs", app, document);
 
   app.useGlobalInterceptors(new LoggingInterceptor());
+  app.useGlobalFilters(new GlobalExceptionFilter());
 
   await app.listen(process.env.PORT ?? 3000);
 
