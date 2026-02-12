@@ -17,6 +17,8 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
+    "test:load": "k6 run k6/load-test.js",
+    "test:load:prod": "k6 run -e BASE_URL=https://seismic-scope-be.rest/api/v1 k6/load-test.js",
     "prepare": "husky",
     "lint-staged": "lint-staged"
   },

@@ -128,6 +128,39 @@ npm run test:cov      # coverage report
 
 [![codecov](https://codecov.io/github/SeismicScope/seismic-backend/graph/badge.svg?token=OF1NT5SQB2)](https://codecov.io/github/SeismicScope/seismic-backend)
 
+## Load Testing
+
+Load tests use [k6](https://k6.io/) with three scenarios:
+
+| Scenario | VUs     | Duration | Purpose                          |
+| -------- | ------- | -------- | -------------------------------- |
+| Smoke    | 3       | 30s      | Baseline — verify endpoints work |
+| Load     | 10→30   | 3m       | Sustained traffic ramp-up        |
+| Spike    | 0→200→0 | 50s      | Sudden burst handling            |
+
+### Endpoints tested
+
+`/health`, `/earthquakes` (list, filters, single), `/map` (global + zoomed), `/analytics/time-series`, `/analytics/stats`, `/earthquakes/magnitude-histogram`
+
+### Run
+
+```bash
+brew install k6                   # one-time install
+
+npm run test:load                 # against localhost:3000
+npm run test:load:prod            # against production
+```
+
+### Thresholds
+
+- **p95 < 2s** for all HTTP requests
+- **p99 < 5s** for all HTTP requests
+- **Error rate < 10%**
+- **p95 < 1.5s** for earthquakes and analytics endpoints
+- **p95 < 2s** for map (spatial) queries
+
+Results are saved to `k6/results/` as JSON.
+
 ## Deployment
 
 GitHub Actions: push to `main` → run tests → SSH to Droplet → `docker compose up -d --build` → `prisma migrate deploy`
@@ -145,7 +178,7 @@ The application is deployed on a hardened Ubuntu 24.04 LTS DigitalOcean Droplet 
 
 ### Infrastructure
 
-- Dockerized services: Backend, PostgreSQL (PostGIS), Redis
+- Dockerized services: Backend (Node.js cluster, 2 workers), PostgreSQL (PostGIS), Redis
 - Nginx reverse proxy
 - HTTPS via Let's Encrypt (auto-renew enabled)
 - CI/CD via GitHub Actions
