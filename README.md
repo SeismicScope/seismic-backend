@@ -120,7 +120,7 @@ GitHub Actions: push to `main` → run tests → SSH to Droplet → `docker comp
 
 ```
 Docker Compose services:
-  backend     Node.js (port 8080, 1.2GB mem limit)
+  backend     Node.js (port 8080, 2.5GB mem limit)
   postgres    postgis/postgis:15-3.4
   redis       redis:7
 ```
