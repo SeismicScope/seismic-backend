@@ -8,6 +8,8 @@ import cookieParser from "cookie-parser";
 import { WINSTON_MODULE_NEST_PROVIDER } from "nest-winston";
 
 import { AppModule } from "./app.module";
+import { MetricsInterceptor } from "./modules/metrics/metrics.interceptor";
+import { MetricsService } from "./modules/metrics/metrics.service";
 import { GlobalExceptionFilter } from "./shared/global-exception.filter";
 import { LoggingInterceptor } from "./shared/logging.interceptor";
 
@@ -47,7 +49,11 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, swaggerConfig);
   SwaggerModule.setup("api/v1/docs", app, document);
 
-  app.useGlobalInterceptors(new LoggingInterceptor());
+  const metricsService = app.get(MetricsService);
+  app.useGlobalInterceptors(
+    new LoggingInterceptor(),
+    new MetricsInterceptor(metricsService),
+  );
   app.useGlobalFilters(new GlobalExceptionFilter());
 
   await app.listen(process.env.PORT ?? 3000);

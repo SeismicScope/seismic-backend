@@ -4,6 +4,7 @@ import * as os from "os";
 import * as path from "path";
 import { PrismaService } from "prisma/prisma.service";
 
+import { MetricsService } from "../metrics/metrics.service";
 import { ImportProcessor } from "./import.processor";
 
 describe("ImportProcessor", () => {
@@ -26,9 +27,20 @@ describe("ImportProcessor", () => {
     ),
   };
 
+  const mockMetrics = {
+    importDuration: {
+      labels: jest.fn().mockReturnValue({ observe: jest.fn() }),
+    },
+    importRowsProcessed: { inc: jest.fn() },
+    importBatchSize: { observe: jest.fn() },
+  };
+
   beforeEach(() => {
     tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "import-test-"));
-    processor = new ImportProcessor(mockPrisma as unknown as PrismaService);
+    processor = new ImportProcessor(
+      mockPrisma as unknown as PrismaService,
+      mockMetrics as unknown as MetricsService,
+    );
     jest.clearAllMocks();
   });
 

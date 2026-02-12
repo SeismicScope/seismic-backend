@@ -8,6 +8,7 @@ import { PrismaService } from "prisma/prisma.service";
 import type { TransformedEarthquakeRow } from "@/types";
 
 import { DB_EARTHQUAKE_NAME, SRID } from "../../constants";
+import { MetricsService } from "../metrics/metrics.service";
 import { transformRow } from "./helpers";
 
 const BATCH_SIZE = 5000;
@@ -16,7 +17,10 @@ const BATCH_SIZE = 5000;
 export class ImportProcessor extends WorkerHost {
   private readonly logger = new Logger(ImportProcessor.name);
 
-  constructor(private readonly prisma: PrismaService) {
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly metrics: MetricsService,
+  ) {
     super();
   }
 
@@ -24,6 +28,7 @@ export class ImportProcessor extends WorkerHost {
     const { filePath, jobId } = job.data;
 
     this.logger.log(`Worker started processing file: ${filePath}`);
+    const startTime = process.hrtime.bigint();
 
     if (!fs.existsSync(filePath)) {
       this.logger.error(`File not found: ${filePath}`);
@@ -86,6 +91,11 @@ export class ImportProcessor extends WorkerHost {
         data: { status: "completed", processed: processedCount },
       });
 
+      this.metrics.importRowsProcessed.inc(processedCount);
+      this.metrics.importDuration
+        .labels("completed")
+        .observe(Number(process.hrtime.bigint() - startTime) / 1_000_000_000);
+
       this.logger.log(
         `Import finished successfully. Total rows: ${processedCount} (jobId=${jobId})`,
       );
@@ -94,6 +104,10 @@ export class ImportProcessor extends WorkerHost {
         `Error processing file (jobId=${jobId})`,
         error instanceof Error ? error.stack : String(error),
       );
+
+      this.metrics.importDuration
+        .labels("failed")
+        .observe(Number(process.hrtime.bigint() - startTime) / 1_000_000_000);
 
       await this.prisma.importJob.update({
         where: { id: jobId },
@@ -121,6 +135,8 @@ export class ImportProcessor extends WorkerHost {
     currentTotal: number;
   }) {
     await this.prisma.$transaction(async (tx) => {
+      this.metrics.importBatchSize.observe(batch.length);
+
       await tx.earthquake.createMany({
         data: batch,
         skipDuplicates: true,

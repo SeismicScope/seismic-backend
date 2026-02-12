@@ -16,6 +16,7 @@ import { EarthquakesModule } from "./modules/earthquakes/earthquakes.module";
 import { HealthModule } from "./modules/health/health.module";
 import { ImportModule } from "./modules/import/import.module";
 import { MapModule } from "./modules/map/map.module";
+import { MetricsModule } from "./modules/metrics/metrics.module";
 import { RedisModule } from "./modules/redis/redis.module";
 
 @Module({
@@ -53,6 +54,7 @@ import { RedisModule } from "./modules/redis/redis.module";
     MapModule,
     AnalyticsModule,
     AuthModule,
+    MetricsModule,
   ],
   controllers: [],
   providers: [
