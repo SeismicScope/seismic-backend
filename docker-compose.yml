@@ -6,8 +6,6 @@ services:
           memory: 2.5GB
     build: .
     restart: always
-    ports:
-      - "8080:8080"
     env_file:
       - .env
     environment:
@@ -26,16 +24,12 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
-    ports:
-      - "5432:5432"
     volumes:
       - db_data:/var/lib/postgresql/data
 
   seismic_redis:
     image: redis:7
     container_name: seismic_redis
-    ports:
-      - "6379:6379"
 
 volumes:
   db_data:
