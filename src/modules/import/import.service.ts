@@ -1,8 +1,7 @@
 import { InjectQueue } from "@nestjs/bullmq";
 import { Injectable } from "@nestjs/common";
 import { Queue } from "bullmq";
-
-import { PrismaService } from "../../../prisma/prisma.service";
+import { PrismaService } from "prisma/prisma.service";
 
 @Injectable()
 export class ImportService {

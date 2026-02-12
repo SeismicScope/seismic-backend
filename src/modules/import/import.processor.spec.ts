@@ -1,8 +1,8 @@
 import * as fs from "fs";
 import * as os from "os";
 import * as path from "path";
+import { PrismaService } from "prisma/prisma.service";
 
-import { PrismaService } from "../../../prisma/prisma.service";
 import { ImportProcessor } from "./import.processor";
 
 describe("ImportProcessor", () => {

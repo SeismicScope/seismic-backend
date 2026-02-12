@@ -1,7 +1,7 @@
 import { getQueueToken } from "@nestjs/bullmq";
 import { Test, TestingModule } from "@nestjs/testing";
+import { PrismaService } from "prisma/prisma.service";
 
-import { PrismaService } from "../../../prisma/prisma.service";
 import { ImportService } from "./import.service";
 
 describe("ImportService", () => {

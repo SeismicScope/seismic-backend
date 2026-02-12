@@ -1,9 +1,10 @@
 import { Processor, WorkerHost } from "@nestjs/bullmq";
+import { Logger } from "@nestjs/common";
 import { Job } from "bullmq";
 import csv from "csv-parser";
 import * as fs from "fs";
+import { PrismaService } from "prisma/prisma.service";
 
-import { PrismaService } from "../../../prisma/prisma.service";
 import { DB_EARTHQUAKE_NAME, SRID } from "../../constants";
 import { transformRow } from "./helpers";
 
@@ -11,15 +12,19 @@ const BATCH_SIZE = 5000;
 
 @Processor("import-earthquakes", { concurrency: 1, lockDuration: 600000 })
 export class ImportProcessor extends WorkerHost {
+  private readonly logger = new Logger(ImportProcessor.name);
+
   constructor(private readonly prisma: PrismaService) {
     super();
   }
 
-  async process(job: Job<{ filePath: string; jobId: number }>): Promise<any> {
-    console.log("Worker started processing file:", job.data.filePath);
+  async process(job: Job<{ filePath: string; jobId: number }>) {
     const { filePath, jobId } = job.data;
 
+    this.logger.log(`Worker started processing file: ${filePath}`);
+
     if (!fs.existsSync(filePath)) {
+      this.logger.error(`File not found: ${filePath}`);
       throw new Error(`File not found: ${filePath}`);
     }
 
@@ -46,14 +51,20 @@ export class ImportProcessor extends WorkerHost {
         if (transformed) {
           batch.push(transformed);
         }
+
         if (batch.length === BATCH_SIZE) {
           await this.processBatch({
             batch,
             jobId,
             currentTotal: processedCount + batch.length,
           });
+
           processedCount += batch.length;
-          console.log(`Successfully processed ${processedCount} rows...`);
+
+          this.logger.log(
+            `Processed ${processedCount} rows so far (jobId=${jobId})`,
+          );
+
           batch = [];
         }
       }
@@ -64,6 +75,7 @@ export class ImportProcessor extends WorkerHost {
           jobId,
           currentTotal: processedCount + batch.length,
         });
+
         processedCount += batch.length;
       }
 
@@ -72,17 +84,25 @@ export class ImportProcessor extends WorkerHost {
         data: { status: "completed", processed: processedCount },
       });
 
-      console.log(`Import finished! Total rows: ${processedCount}`);
+      this.logger.log(
+        `Import finished successfully. Total rows: ${processedCount} (jobId=${jobId})`,
+      );
     } catch (error) {
-      console.error("Error processing file:", error);
+      this.logger.error(
+        `Error processing file (jobId=${jobId})`,
+        error instanceof Error ? error.stack : String(error),
+      );
+
       await this.prisma.importJob.update({
         where: { id: jobId },
         data: { status: "failed" },
       });
+
       throw error;
     } finally {
       if (fs.existsSync(filePath)) {
         fs.unlinkSync(filePath);
+        this.logger.debug(`Temporary file removed: ${filePath}`);
       }
     }
 
@@ -90,7 +110,7 @@ export class ImportProcessor extends WorkerHost {
   }
 
   private async processBatch({
-    batch = [],
+    batch,
     jobId,
     currentTotal,
   }: {
@@ -99,7 +119,10 @@ export class ImportProcessor extends WorkerHost {
     currentTotal: number;
   }) {
     await this.prisma.$transaction(async (tx) => {
-      await tx.earthquake.createMany({ data: batch, skipDuplicates: true });
+      await tx.earthquake.createMany({
+        data: batch,
+        skipDuplicates: true,
+      });
 
       await tx.$executeRawUnsafe(`
         UPDATE "${DB_EARTHQUAKE_NAME}"

@@ -1,6 +1,6 @@
 import { Test, TestingModule } from "@nestjs/testing";
+import { PrismaService } from "prisma/prisma.service";
 
-import { PrismaService } from "../../../prisma/prisma.service";
 import { RedisService } from "../redis/redis.service";
 import { AnalyticsService } from "./analytics.service";
 

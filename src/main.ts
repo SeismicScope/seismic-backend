@@ -5,11 +5,19 @@ import { ValidationPipe } from "@nestjs/common";
 import { NestFactory } from "@nestjs/core";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import cookieParser from "cookie-parser";
+import { WINSTON_MODULE_NEST_PROVIDER } from "nest-winston";
 
 import { AppModule } from "./app.module";
+import { LoggingInterceptor } from "./lib/logging.interceptor";
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    bufferLogs: true,
+  });
+
+  app.useLogger(app.get(WINSTON_MODULE_NEST_PROVIDER));
+
+  const logger = app.get(WINSTON_MODULE_NEST_PROVIDER);
 
   app.useGlobalPipes(
     new ValidationPipe({
@@ -36,9 +44,14 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, swaggerConfig);
   SwaggerModule.setup("api/docs", app, document);
 
+  app.useGlobalInterceptors(new LoggingInterceptor());
+
   await app.listen(process.env.PORT ?? 3000);
 
-  console.log(`Application is running on: ${await app.getUrl()}`);
-  console.log(`Swagger docs: ${await app.getUrl()}/api/docs`);
+  const url = await app.getUrl();
+
+  logger.log(`Application is running on: ${url}`);
+  logger.log(`Swagger docs: ${url}/api/docs`);
 }
+
 bootstrap();
