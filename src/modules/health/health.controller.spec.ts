@@ -38,12 +38,16 @@ describe("HealthController", () => {
         new Error("Connection refused"),
       );
 
-      const result = await controller.check();
-
-      expect(result.status).toBe("error");
-      expect(result.db).toBe("disconnected");
-      expect(result.uptime).toBeDefined();
-      expect(result.timestamp).toBeDefined();
+      try {
+        await controller.check();
+        fail("Expected ServiceUnavailableException");
+      } catch (error: any) {
+        const response = error.getResponse();
+        expect(response.status).toBe("error");
+        expect(response.db).toBe("disconnected");
+        expect(response.uptime).toBeDefined();
+        expect(response.timestamp).toBeDefined();
+      }
     });
 
     it("should return valid ISO timestamp", async () => {

@@ -3,13 +3,18 @@ import { Test, TestingModule } from "@nestjs/testing";
 
 import { RedisService } from "./redis.service";
 
+const mockPipeline = {
+  unlink: jest.fn().mockReturnThis(),
+  exec: jest.fn().mockResolvedValue([]),
+};
+
 const mockRedisClient = {
   ping: jest.fn().mockResolvedValue("PONG"),
   quit: jest.fn().mockResolvedValue("OK"),
   get: jest.fn(),
   set: jest.fn(),
-  keys: jest.fn(),
-  del: jest.fn(),
+  scanStream: jest.fn(),
+  pipeline: jest.fn().mockReturnValue(mockPipeline),
 };
 
 jest.mock("ioredis", () => {
@@ -123,22 +128,40 @@ describe("RedisService", () => {
 
   describe("del", () => {
     it("should delete keys matching pattern", async () => {
-      mockRedisClient.keys.mockResolvedValue(["ts:a", "ts:b", "ts:c"]);
-      mockRedisClient.del.mockResolvedValue(3);
+      const chunks = [["ts:a", "ts:b", "ts:c"]];
+      mockRedisClient.scanStream.mockReturnValue(
+        (async function* () {
+          for (const c of chunks) yield c;
+        })(),
+      );
 
       await service.del("ts:*");
 
-      expect(mockRedisClient.keys).toHaveBeenCalledWith("ts:*");
-      expect(mockRedisClient.del).toHaveBeenCalledWith("ts:a", "ts:b", "ts:c");
+      expect(mockRedisClient.scanStream).toHaveBeenCalledWith({
+        match: "ts:*",
+        count: 100,
+      });
+      expect(mockRedisClient.pipeline).toHaveBeenCalled();
+      expect(mockPipeline.unlink).toHaveBeenCalledWith("ts:a", "ts:b", "ts:c");
+      expect(mockPipeline.exec).toHaveBeenCalled();
     });
 
-    it("should not call del when no keys match pattern", async () => {
-      mockRedisClient.keys.mockResolvedValue([]);
+    it("should not call unlink when no keys match pattern", async () => {
+      const chunks: string[][] = [[]];
+      mockRedisClient.scanStream.mockReturnValue(
+        (async function* () {
+          for (const c of chunks) yield c;
+        })(),
+      );
 
       await service.del("nonexistent:*");
 
-      expect(mockRedisClient.keys).toHaveBeenCalledWith("nonexistent:*");
-      expect(mockRedisClient.del).not.toHaveBeenCalled();
+      expect(mockRedisClient.scanStream).toHaveBeenCalledWith({
+        match: "nonexistent:*",
+        count: 100,
+      });
+      expect(mockPipeline.unlink).not.toHaveBeenCalled();
+      expect(mockPipeline.exec).toHaveBeenCalled();
     });
   });
 });

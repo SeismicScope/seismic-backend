@@ -13,7 +13,7 @@ export function transformRow(row: any) {
     depth: parseFloat(row.depth) || 0,
     latitude,
     longitude,
-    location: row.place || "",
+    location: row.location || "",
     externalId: row.id,
   };
 }
