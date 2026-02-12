@@ -1,5 +1,6 @@
 import { Controller, Get, Post, Req, Res, UseGuards } from "@nestjs/common";
 import { ApiOperation, ApiTags } from "@nestjs/swagger";
+import { Throttle } from "@nestjs/throttler";
 import { Request, Response } from "express";
 
 import { AuthService } from "./auth.service";
@@ -12,6 +13,7 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post("login")
+  @Throttle({ strict: { ttl: 60_000, limit: 5 } })
   @ApiOperation({ summary: "Login and receive access token cookie" })
   login(@Res({ passthrough: true }) res: Response) {
     const { access_token } = this.authService.login();
