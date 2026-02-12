@@ -9,7 +9,7 @@ describe("transformRow", () => {
       id: "us2023abc",
       mag: "6.3",
       depth: "15",
-      place: "Near Tokyo, Japan",
+      location: "Near Tokyo, Japan",
     };
 
     const result = transformRow(row);
@@ -33,7 +33,7 @@ describe("transformRow", () => {
       id: "us2023abc",
       mag: "6.3",
       depth: "15",
-      place: "Test",
+      location: "Test",
     };
 
     expect(transformRow(row)).toBeNull();
@@ -47,7 +47,7 @@ describe("transformRow", () => {
       id: "us2023abc",
       mag: "6.3",
       depth: "15",
-      place: "Test",
+      location: "Test",
     };
 
     expect(transformRow(row)).toBeNull();
@@ -61,7 +61,7 @@ describe("transformRow", () => {
       id: "us2023abc",
       mag: "6.3",
       depth: "15",
-      place: "Test",
+      location: "Test",
     };
 
     expect(transformRow(row)).toBeNull();
@@ -75,7 +75,7 @@ describe("transformRow", () => {
       id: "",
       mag: "6.3",
       depth: "15",
-      place: "Test",
+      location: "Test",
     };
 
     expect(transformRow(row)).toBeNull();
@@ -89,7 +89,7 @@ describe("transformRow", () => {
       id: "us2023abc",
       mag: "",
       depth: "15",
-      place: "Test",
+      location: "Test",
     };
 
     const result = transformRow(row);
@@ -104,7 +104,7 @@ describe("transformRow", () => {
       id: "us2023abc",
       mag: "5.0",
       depth: "",
-      place: "Test",
+      location: "Test",
     };
 
     const result = transformRow(row);
@@ -119,7 +119,7 @@ describe("transformRow", () => {
       id: "us2023abc",
       mag: "5.0",
       depth: "10",
-      place: "",
+      location: "",
     };
 
     const result = transformRow(row);
@@ -134,7 +134,7 @@ describe("transformRow", () => {
       id: "us2023xyz",
       mag: "4.5",
       depth: "25",
-      place: "Near Sydney",
+      location: "Near Sydney",
     };
 
     const result = transformRow(row);
