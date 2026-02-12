@@ -41,12 +41,13 @@ jobs:
       - name: Deploy via SSH
         uses: appleboy/ssh-action@master
         with:
-          host: 164.90.184.207
-          username: root
+          host: 46.101.220.246
+          username: vasyl
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             cd ~/seismic-backend
             git pull origin main
+            docker compose down
             docker compose up -d --build
-            docker compose exec -T backend npx prisma db push
+            docker compose exec -T backend npx prisma migrate deploy
             docker image prune -f
