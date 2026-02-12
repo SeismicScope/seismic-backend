@@ -16,7 +16,7 @@ export function buildEarthquakeWhere(
   }
 
   if (filters.dateFrom || filters.dateTo) {
-    where.occuredAt = { gte: filters.dateFrom, lte: filters.dateTo };
+    where.occurredAt = { gte: filters.dateFrom, lte: filters.dateTo };
   }
 
   return where;
@@ -44,11 +44,11 @@ export function buildEarthquakeWhereSql(filters: EarthquakeFilterParams) {
     params.push(filters.maxDepth);
   }
   if (filters.dateFrom) {
-    conditions.push(`"occuredAt" >= $${idx++}`);
+    conditions.push(`"occurredAt" >= $${idx++}`);
     params.push(filters.dateFrom);
   }
   if (filters.dateTo) {
-    conditions.push(`"occuredAt" <= $${idx++}`);
+    conditions.push(`"occurredAt" <= $${idx++}`);
     params.push(filters.dateTo);
   }
 

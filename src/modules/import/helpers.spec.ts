@@ -15,7 +15,7 @@ describe("transformRow", () => {
     const result = transformRow(row);
 
     expect(result).toEqual({
-      occuredAt: new Date("2023-01-15T10:30:00.000Z"),
+      occurredAt: new Date("2023-01-15T10:30:00.000Z"),
       magnitude: 6.3,
       depth: 15,
       latitude: 35.05,

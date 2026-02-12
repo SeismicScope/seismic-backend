@@ -10,8 +10,8 @@ export const SORT_MAP: Record<
   SortOption,
   Prisma.EarthquakeOrderByWithRelationInput
 > = {
-  date_asc: { occuredAt: "asc" },
-  date_desc: { occuredAt: "desc" },
+  date_asc: { occurredAt: "asc" },
+  date_desc: { occurredAt: "desc" },
   magnitude_asc: { magnitude: "asc" },
   magnitude_desc: { magnitude: "desc" },
   depth_asc: { depth: "asc" },

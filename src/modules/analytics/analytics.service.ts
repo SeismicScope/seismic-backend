@@ -43,7 +43,7 @@ export class AnalyticsService {
     >(
       `
       SELECT
-        DATE_TRUNC($${idx}, "occuredAt") as date,
+        DATE_TRUNC($${idx}, "occurredAt") as date,
         COUNT(*) as count
       FROM "${DB_EARTHQUAKE_NAME}"
       WHERE 1=1

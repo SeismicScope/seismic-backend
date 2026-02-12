@@ -37,11 +37,11 @@ export class MapService {
           latitude: number;
           longitude: number;
           location: string | null;
-          occuredAt: Date;
+          occurredAt: Date;
         }[]
       >(
         `
-        SELECT id, magnitude, depth, latitude, longitude, location, "occuredAt"
+        SELECT id, magnitude, depth, latitude, longitude, location, "occurredAt"
         FROM "${DB_EARTHQUAKE_NAME}"
         WHERE geom && ST_MakeEnvelope($1, $2, $3, $4, $5)
         LIMIT $6;

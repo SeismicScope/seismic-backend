@@ -32,7 +32,7 @@ describe("buildEarthquakeWhere", () => {
     const dateFrom = new Date("2023-01-01");
     const dateTo = new Date("2023-12-31");
     const result = buildEarthquakeWhere({ dateFrom, dateTo });
-    expect(result.occuredAt).toEqual({ gte: dateFrom, lte: dateTo });
+    expect(result.occurredAt).toEqual({ gte: dateFrom, lte: dateTo });
   });
 
   it("should combine all filters", () => {
@@ -47,7 +47,7 @@ describe("buildEarthquakeWhere", () => {
 
     expect(result.magnitude).toEqual({ gte: 3, lte: 7 });
     expect(result.depth).toEqual({ gte: 0, lte: 50 });
-    expect(result.occuredAt).toEqual({ gte: dateFrom, lte: undefined });
+    expect(result.occurredAt).toEqual({ gte: dateFrom, lte: undefined });
   });
 });
 

@@ -48,6 +48,7 @@ jobs:
             cd ~/seismic-backend
             git pull origin main
             docker compose down
-            docker compose up -d --build
-            docker compose exec -T backend npx prisma migrate deploy
+            docker compose build
+            docker compose up -d seismic_db seismic_redis
+            docker compose up -d backend
             docker image prune -f

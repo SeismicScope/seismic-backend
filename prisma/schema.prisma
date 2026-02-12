@@ -9,7 +9,7 @@ datasource db {
 model Earthquake {
   id         Int                      @id @default(autoincrement())
   externalId String?                  @unique
-  occuredAt  DateTime
+  occurredAt  DateTime
   magnitude  Float
   depth      Float
   latitude   Float
@@ -19,8 +19,8 @@ model Earthquake {
   geom       Unsupported("geometry")?
 
   @@index([magnitude], map: "earthquake_magnitude_idx")
-  @@index([occuredAt], map: "earthquake_occuredAt_idx")
-  @@index([magnitude, occuredAt], map: "earthquake_mag_date_idx")
+  @@index([occurredAt], map: "earthquake_occurredAt_idx")
+  @@index([magnitude, occurredAt], map: "earthquake_mag_date_idx")
   @@index([geom], map: "Earthquake_geom_idx", type: Gist)
 }
 

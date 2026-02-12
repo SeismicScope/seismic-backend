@@ -30,6 +30,11 @@ REST API for earthquake data — import, storage, spatial queries, analytics, an
 
 - Node.js 22+ (see `.nvmrc`)
 - Docker & Docker Compose
+- For localhost add the following to `docker-compose.yml` for database:
+  ```yaml
+  ports:
+    - "5432:5432"
+  ```
 
 ### Setup
 

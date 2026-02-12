@@ -50,7 +50,7 @@ describe("MapService", () => {
           latitude: 35.0,
           longitude: 139.0,
           location: "Japan",
-          occuredAt: new Date(),
+          occurredAt: new Date(),
         },
       ];
       mockPrisma.$queryRawUnsafe

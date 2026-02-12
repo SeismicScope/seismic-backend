@@ -129,7 +129,7 @@ describe("EarthquakesService", () => {
 
       expect(mockPrisma.earthquake.findMany).toHaveBeenCalledWith(
         expect.objectContaining({
-          orderBy: { occuredAt: "asc" },
+          orderBy: { occurredAt: "asc" },
         }),
       );
     });

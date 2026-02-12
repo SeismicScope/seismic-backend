@@ -8,7 +8,7 @@ export function transformRow(row: any) {
   }
 
   return {
-    occuredAt: date,
+    occurredAt: date,
     magnitude: parseFloat(row.mag) || 0,
     depth: parseFloat(row.depth) || 0,
     latitude,
