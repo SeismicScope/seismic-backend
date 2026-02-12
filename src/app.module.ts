@@ -8,6 +8,7 @@ import { SentryModule } from "@sentry/nestjs/setup";
 import { WinstonModule } from "nest-winston";
 import { PrismaModule } from "prisma/prisma.module";
 
+import { envValidationSchema } from "./lib/env.validation";
 import { winstonConfig } from "./lib/winston.config";
 import { AnalyticsModule } from "./modules/analytics/analytics.module";
 import { AuthModule } from "./modules/auth/auth.module";
@@ -21,7 +22,10 @@ import { RedisModule } from "./modules/redis/redis.module";
   imports: [
     SentryModule.forRoot(),
     WinstonModule.forRoot(winstonConfig),
-    ConfigModule.forRoot({ isGlobal: true }),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      validationSchema: envValidationSchema,
+    }),
     ThrottlerModule.forRoot([
       { name: "default", ttl: 60_000, limit: 500 },
       { name: "strict", ttl: 60_000, limit: 50 },
