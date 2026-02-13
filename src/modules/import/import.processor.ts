@@ -9,6 +9,7 @@ import type { TransformedEarthquakeRow } from "@/types";
 
 import { DB_EARTHQUAKE_NAME, SRID } from "../../constants";
 import { MetricsService } from "../metrics/metrics.service";
+import { RedisService } from "../redis/redis.service";
 import { transformRow } from "./helpers";
 
 const BATCH_SIZE = 5000;
@@ -20,6 +21,7 @@ export class ImportProcessor extends WorkerHost {
   constructor(
     private readonly prisma: PrismaService,
     private readonly metrics: MetricsService,
+    private readonly redis: RedisService,
   ) {
     super();
   }
@@ -90,6 +92,11 @@ export class ImportProcessor extends WorkerHost {
         where: { id: jobId },
         data: { status: "completed", processed: processedCount },
       });
+
+      await Promise.all([
+        this.redis.del("stats:*"),
+        this.redis.del("histogram:*"),
+      ]);
 
       this.metrics.importRowsProcessed.inc(processedCount);
       this.metrics.importDuration

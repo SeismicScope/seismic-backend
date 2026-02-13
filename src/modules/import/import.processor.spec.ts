@@ -5,6 +5,7 @@ import * as path from "path";
 import { PrismaService } from "prisma/prisma.service";
 
 import { MetricsService } from "../metrics/metrics.service";
+import { RedisService } from "../redis/redis.service";
 import { ImportProcessor } from "./import.processor";
 
 describe("ImportProcessor", () => {
@@ -35,11 +36,16 @@ describe("ImportProcessor", () => {
     importBatchSize: { observe: jest.fn() },
   };
 
+  const mockRedis = {
+    del: jest.fn().mockResolvedValue(undefined),
+  };
+
   beforeEach(() => {
     tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "import-test-"));
     processor = new ImportProcessor(
       mockPrisma as unknown as PrismaService,
       mockMetrics as unknown as MetricsService,
+      mockRedis as unknown as RedisService,
     );
     jest.clearAllMocks();
   });

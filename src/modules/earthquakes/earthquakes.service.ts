@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { Prisma } from "@prisma/client";
 import { PrismaService } from "prisma/prisma.service";
 
@@ -59,15 +59,28 @@ export class EarthquakesService {
     };
   }
 
-  async getEarthquakeById(id: number): Promise<EarthquakeResponseDto | null> {
-    return this.prisma.earthquake.findUnique({
+  async getEarthquakeById(id: number): Promise<EarthquakeResponseDto> {
+    const earthquake = await this.prisma.earthquake.findUnique({
       select: EARTHQUAKE_SELECT,
       where: { id },
     });
+
+    if (!earthquake) {
+      throw new NotFoundException(`Earthquake with id ${id} not found`);
+    }
+
+    return earthquake;
   }
 
   async getEarthquakesMagnitudeHistogram(filters: GetEarthquakesDto) {
-    const cacheKey = `histogram:${JSON.stringify(filters)}`;
+    const sortedFilters = Object.keys(filters)
+      .sort()
+      .reduce<Record<string, unknown>>((acc, key) => {
+        acc[key] = filters[key as keyof GetEarthquakesDto];
+
+        return acc;
+      }, {});
+    const cacheKey = `histogram:${JSON.stringify(sortedFilters)}`;
     const cached =
       await this.redis.get<{ magnitude: number; count: number }[]>(cacheKey);
 

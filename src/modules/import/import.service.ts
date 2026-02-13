@@ -27,16 +27,6 @@ export class ImportService {
     return dbJob;
   }
 
-  async updateStatus(
-    id: number,
-    data: { status?: string; processed?: number },
-  ) {
-    return this.prisma.importJob.update({
-      where: { id },
-      data,
-    });
-  }
-
   async getImportStatus(id: number) {
     return this.prisma.importJob.findUnique({
       where: { id },

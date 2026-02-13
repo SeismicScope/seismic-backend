@@ -10,7 +10,6 @@ describe("ImportService", () => {
   const mockPrisma = {
     importJob: {
       create: jest.fn(),
-      update: jest.fn(),
       findUnique: jest.fn(),
     },
   };
@@ -94,48 +93,6 @@ describe("ImportService", () => {
 
       expect(result.id).toBe(5);
       expect(result.status).toBe("queued");
-    });
-  });
-
-  describe("updateStatus", () => {
-    it("should update job status", async () => {
-      const updatedJob = { id: 1, status: "completed", processed: 5000 };
-      mockPrisma.importJob.update.mockResolvedValue(updatedJob);
-
-      const result = await service.updateStatus(1, {
-        status: "completed",
-        processed: 5000,
-      });
-
-      expect(result).toEqual(updatedJob);
-      expect(mockPrisma.importJob.update).toHaveBeenCalledWith({
-        where: { id: 1 },
-        data: { status: "completed", processed: 5000 },
-      });
-    });
-
-    it("should update only processed count", async () => {
-      const updatedJob = { id: 1, status: "processing", processed: 10000 };
-      mockPrisma.importJob.update.mockResolvedValue(updatedJob);
-
-      await service.updateStatus(1, { processed: 10000 });
-
-      expect(mockPrisma.importJob.update).toHaveBeenCalledWith({
-        where: { id: 1 },
-        data: { processed: 10000 },
-      });
-    });
-
-    it("should update only status", async () => {
-      const updatedJob = { id: 3, status: "failed" };
-      mockPrisma.importJob.update.mockResolvedValue(updatedJob);
-
-      await service.updateStatus(3, { status: "failed" });
-
-      expect(mockPrisma.importJob.update).toHaveBeenCalledWith({
-        where: { id: 3 },
-        data: { status: "failed" },
-      });
     });
   });
 
