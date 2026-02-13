@@ -10,6 +10,8 @@ export const envValidationSchema = Joi.object({
 
   JWT_SECRET: Joi.string().min(8).required(),
 
+  IMPORT_SECRET: Joi.string().min(1).required(),
+
   NODE_ENV: Joi.string()
     .valid("develop", "production", "test")
     .default("develop"),

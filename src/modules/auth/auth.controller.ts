@@ -1,9 +1,18 @@
-import { Controller, Get, Post, Req, Res, UseGuards } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Req,
+  Res,
+  UseGuards,
+} from "@nestjs/common";
 import { ApiOperation, ApiTags } from "@nestjs/swagger";
 import { Throttle } from "@nestjs/throttler";
 import { Request, Response } from "express";
 
 import { AuthService } from "./auth.service";
+import { LoginDto } from "./dto/login.dto";
 import { JwtGuard } from "./guards/jwt.guard";
 import type { JwtPayload } from "./types";
 
@@ -15,8 +24,11 @@ export class AuthController {
   @Post("login")
   @Throttle({ strict: { ttl: 60_000, limit: 5 } })
   @ApiOperation({ summary: "Login and receive access token cookie" })
-  login(@Res({ passthrough: true }) res: Response) {
-    const { access_token } = this.authService.login();
+  async login(
+    @Body() dto: LoginDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const { access_token } = await this.authService.login(dto);
 
     res.cookie("access_token", access_token, {
       httpOnly: true,

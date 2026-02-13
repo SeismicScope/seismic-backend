@@ -24,6 +24,14 @@ model Earthquake {
   @@index([geom], map: "Earthquake_geom_idx", type: Gist)
 }
 
+model User {
+  id           Int      @id @default(autoincrement())
+  username     String   @unique
+  passwordHash String
+  role         String   @default("admin")
+  createdAt    DateTime @default(now())
+}
+
 model ImportJob {
   id        Int      @id @default(autoincrement())
   fileName  String

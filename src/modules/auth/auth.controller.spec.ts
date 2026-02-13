@@ -24,16 +24,18 @@ describe("AuthController", () => {
   });
 
   describe("login", () => {
-    it("should set cookie and return success", () => {
-      mockService.login.mockReturnValue({ access_token: "jwt-token" });
+    it("should set cookie and return success", async () => {
+      mockService.login.mockResolvedValue({ access_token: "jwt-token" });
 
       const mockRes = {
         cookie: jest.fn(),
       } as unknown as Response;
 
-      const result = controller.login(mockRes);
+      const dto = { username: "admin", password: "secret123" };
+      const result = await controller.login(dto, mockRes);
 
       expect(result).toEqual({ success: true });
+      expect(mockService.login).toHaveBeenCalledWith(dto);
       expect(mockRes.cookie).toHaveBeenCalledWith(
         "access_token",
         "jwt-token",

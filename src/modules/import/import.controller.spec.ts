@@ -1,3 +1,5 @@
+import { ForbiddenException } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
 import { Test, TestingModule } from "@nestjs/testing";
 
 import { ImportController } from "./import.controller";
@@ -11,10 +13,21 @@ describe("ImportController", () => {
     getImportStatus: jest.fn(),
   };
 
+  const mockConfigService = {
+    get: jest.fn((key: string) => {
+      if (key === "IMPORT_SECRET") return "correct-secret";
+
+      return undefined;
+    }),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [ImportController],
-      providers: [{ provide: ImportService, useValue: mockService }],
+      providers: [
+        { provide: ImportService, useValue: mockService },
+        { provide: ConfigService, useValue: mockConfigService },
+      ],
     }).compile();
 
     controller = module.get<ImportController>(ImportController);
@@ -23,7 +36,7 @@ describe("ImportController", () => {
   });
 
   describe("upload", () => {
-    it("should create import from uploaded file", async () => {
+    it("should create import from uploaded file with valid secret", async () => {
       const dbJob = {
         id: 1,
         fileName: "data.csv",
@@ -37,12 +50,23 @@ describe("ImportController", () => {
         originalname: "data.csv",
       } as Express.Multer.File;
 
-      const result = await controller.upload(mockFile);
+      const result = await controller.upload(mockFile, "correct-secret");
 
       expect(result).toEqual(dbJob);
       expect(mockService.createImport).toHaveBeenCalledWith(
         "/uploads/data.csv",
         "data.csv",
+      );
+    });
+
+    it("should throw ForbiddenException for invalid secret", async () => {
+      const mockFile = {
+        path: "/uploads/data.csv",
+        originalname: "data.csv",
+      } as Express.Multer.File;
+
+      await expect(controller.upload(mockFile, "wrong-secret")).rejects.toThrow(
+        ForbiddenException,
       );
     });
   });

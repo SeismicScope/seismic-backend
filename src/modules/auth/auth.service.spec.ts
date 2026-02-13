@@ -1,5 +1,8 @@
+import { UnauthorizedException } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { Test, TestingModule } from "@nestjs/testing";
+import bcrypt from "bcrypt";
+import { PrismaService } from "prisma/prisma.service";
 
 import { AuthService } from "./auth.service";
 
@@ -10,11 +13,18 @@ describe("AuthService", () => {
     sign: jest.fn(),
   };
 
+  const mockPrismaService = {
+    user: {
+      findUnique: jest.fn(),
+    },
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         AuthService,
         { provide: JwtService, useValue: mockJwtService },
+        { provide: PrismaService, useValue: mockPrismaService },
       ],
     }).compile();
 
@@ -24,31 +34,53 @@ describe("AuthService", () => {
   });
 
   describe("login", () => {
-    it("should return access_token", () => {
+    const hashedPassword = bcrypt.hashSync("secret123", 10);
+
+    const mockUser = {
+      id: 1,
+      username: "admin",
+      passwordHash: hashedPassword,
+      role: "admin",
+    };
+
+    it("should return access_token for valid credentials", async () => {
+      mockPrismaService.user.findUnique.mockResolvedValue(mockUser);
       mockJwtService.sign.mockReturnValue("jwt-token-123");
 
-      const result = service.login();
+      const result = await service.login({
+        username: "admin",
+        password: "secret123",
+      });
 
       expect(result).toEqual({ access_token: "jwt-token-123" });
     });
 
-    it("should sign payload with name and role", () => {
+    it("should sign payload with username and role from DB", async () => {
+      mockPrismaService.user.findUnique.mockResolvedValue(mockUser);
       mockJwtService.sign.mockReturnValue("token");
 
-      service.login();
+      await service.login({ username: "admin", password: "secret123" });
 
       expect(mockJwtService.sign).toHaveBeenCalledWith({
-        name: "Admin",
+        name: "admin",
         role: "admin",
       });
     });
 
-    it("should call jwtService.sign exactly once", () => {
-      mockJwtService.sign.mockReturnValue("token");
+    it("should throw UnauthorizedException for non-existent user", async () => {
+      mockPrismaService.user.findUnique.mockResolvedValue(null);
 
-      service.login();
+      await expect(
+        service.login({ username: "wrong", password: "secret123" }),
+      ).rejects.toThrow(UnauthorizedException);
+    });
 
-      expect(mockJwtService.sign).toHaveBeenCalledTimes(1);
+    it("should throw UnauthorizedException for invalid password", async () => {
+      mockPrismaService.user.findUnique.mockResolvedValue(mockUser);
+
+      await expect(
+        service.login({ username: "admin", password: "wrong" }),
+      ).rejects.toThrow(UnauthorizedException);
     });
   });
 });

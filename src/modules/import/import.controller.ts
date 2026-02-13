@@ -1,5 +1,7 @@
 import {
+  Body,
   Controller,
+  ForbiddenException,
   Get,
   Param,
   ParseIntPipe,
@@ -8,6 +10,7 @@ import {
   UseGuards,
   UseInterceptors,
 } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { ApiConsumes, ApiOperation, ApiTags } from "@nestjs/swagger";
 import { diskStorage } from "multer";
@@ -20,7 +23,10 @@ import { ImportService } from "./import.service";
 @ApiTags("Import")
 @Controller("import")
 export class ImportController {
-  constructor(private readonly importService: ImportService) {}
+  constructor(
+    private readonly importService: ImportService,
+    private readonly config: ConfigService,
+  ) {}
 
   @UseGuards(JwtGuard, RolesGuard)
   @Post("upload")
@@ -50,7 +56,16 @@ export class ImportController {
       },
     }),
   )
-  async upload(@UploadedFile() file: Express.Multer.File) {
+  async upload(
+    @UploadedFile() file: Express.Multer.File,
+    @Body("secretWord") secretWord: string,
+  ) {
+    const expected = this.config.get<string>("IMPORT_SECRET");
+
+    if (!secretWord || secretWord !== expected) {
+      throw new ForbiddenException("Invalid secret word");
+    }
+
     return this.importService.createImport(file.path, file.originalname);
   }
 

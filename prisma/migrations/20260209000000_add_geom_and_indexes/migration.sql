@@ -1,3 +1,6 @@
+-- Enable PostGIS
+CREATE EXTENSION IF NOT EXISTS postgis;
+
 -- AlterTable: Add geom column
 ALTER TABLE "Earthquake" ADD COLUMN "geom" geometry;
 
