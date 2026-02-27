@@ -1,3 +1,9 @@
+# [1.3.0](https://github.com/SeismicScope/seismic-backend/compare/v1.2.0...v1.3.0) (2026-02-27)
+
+### Features
+
+- **map:** add vector tile endpoint for earthquake data visualization ([490d411](https://github.com/SeismicScope/seismic-backend/commit/490d411580af6eefd72f2e5755dd8c145db74733))
+
 # [1.2.0](https://github.com/SeismicScope/seismic-backend/compare/v1.1.0...v1.2.0) (2026-02-27)
 
 ### Features
