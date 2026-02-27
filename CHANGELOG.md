@@ -1,3 +1,9 @@
+# [1.2.0](https://github.com/SeismicScope/seismic-backend/compare/v1.1.0...v1.2.0) (2026-02-27)
+
+### Features
+
+- **map:** add coordinate rounding for cache optimization and order results by date ([5992c57](https://github.com/SeismicScope/seismic-backend/commit/5992c57ed8acdbc26f3c8677d6123c08a651caa2))
+
 # [1.1.0](https://github.com/SeismicScope/seismic-backend/compare/v1.0.0...v1.1.0) (2026-02-27)
 
 ### Features
