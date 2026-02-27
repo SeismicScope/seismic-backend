@@ -1,3 +1,9 @@
+## [1.3.2](https://github.com/SeismicScope/seismic-backend/compare/v1.3.1...v1.3.2) (2026-02-27)
+
+### Bug Fixes
+
+- **auth:** set sameSite cookie attribute to 'none' for all environments ([3e0ba89](https://github.com/SeismicScope/seismic-backend/commit/3e0ba89324071522995fa33781ec989b9bb59554))
+
 ## [1.3.1](https://github.com/SeismicScope/seismic-backend/compare/v1.3.0...v1.3.1) (2026-02-27)
 
 ### Bug Fixes
