@@ -37,7 +37,7 @@ describe("MapController", () => {
       mockService.getMap.mockResolvedValue({
         data: [],
         total: 0,
-        limit: 50_000,
+        limit: 70_000,
       });
 
       const dto = { west: 0, south: 0, east: 10, north: 10, zoom: 3 };

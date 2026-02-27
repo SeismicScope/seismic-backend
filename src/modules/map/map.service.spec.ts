@@ -72,7 +72,7 @@ describe("MapService", () => {
 
       const result = await service.getMap({ ...defaultDto, zoom: 3 });
 
-      expect(result.limit).toBe(50_000);
+      expect(result.limit).toBe(70_000);
     });
 
     it("should return cached data when available", async () => {

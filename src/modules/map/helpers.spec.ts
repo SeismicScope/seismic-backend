@@ -5,9 +5,9 @@ describe("getLimitByZoom", () => {
     expect(getLimitByZoom(undefined)).toBe(200_000);
   });
 
-  it("should return 50_000 for zoom <= 4", () => {
-    expect(getLimitByZoom(1)).toBe(50_000);
-    expect(getLimitByZoom(4)).toBe(50_000);
+  it("should return 70_000 for zoom <= 4", () => {
+    expect(getLimitByZoom(1)).toBe(70_000);
+    expect(getLimitByZoom(4)).toBe(70_000);
   });
 
   it("should return 100_000 for zoom 5-6", () => {
