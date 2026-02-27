@@ -1,3 +1,9 @@
+# [1.1.0](https://github.com/SeismicScope/seismic-backend/compare/v1.0.0...v1.1.0) (2026-02-27)
+
+### Features
+
+- **map-points:** increase zoom limit for level 4 and below from 50k to 70k ([e837fc0](https://github.com/SeismicScope/seismic-backend/commit/e837fc09b01607684703e82a5dc71d2debfefe13))
+
 # 1.0.0 (2026-02-20)
 
 ### Features
