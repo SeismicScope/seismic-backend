@@ -1,3 +1,9 @@
+## [1.3.1](https://github.com/SeismicScope/seismic-backend/compare/v1.3.0...v1.3.1) (2026-02-27)
+
+### Bug Fixes
+
+- **map:** transform geometry to Web Mercator (EPSG:3857) for vector titles ([446515d](https://github.com/SeismicScope/seismic-backend/commit/446515d2cd5d943da8e779507342f3a6dbcaf2e7))
+
 # [1.3.0](https://github.com/SeismicScope/seismic-backend/compare/v1.2.0...v1.3.0) (2026-02-27)
 
 ### Features
