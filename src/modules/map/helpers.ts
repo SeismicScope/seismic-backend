@@ -9,3 +9,15 @@ export function getLimitByZoom(zoom?: number): number {
 
   return MAX_LIMIT;
 }
+
+export function getPercision(zoom: number): number {
+  if (zoom <= 4) return 1;
+  if (zoom <= 6) return 0.1;
+  if (zoom <= 8) return 0.01;
+
+  return 0.001;
+}
+
+export function roundCoord(value: number, precision: number): number {
+  return Math.round(value / precision) * precision;
+}

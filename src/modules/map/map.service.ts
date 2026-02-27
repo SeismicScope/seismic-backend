@@ -7,7 +7,7 @@ import type { MapEarthquake } from "@/types";
 import { DB_EARTHQUAKE_NAME, SRID } from "../../constants";
 import { RedisService } from "../redis/redis.service";
 import { GetMapDto } from "./dto/get-map.dto";
-import { getLimitByZoom } from "./helpers";
+import { getLimitByZoom, getPercision, roundCoord } from "./helpers";
 
 const MAP_TTL = 60; // 1 minute (map data changes with viewport)
 
@@ -19,10 +19,15 @@ export class MapService {
   ) {}
 
   async getMap(dto: GetMapDto) {
-    const { west, south, east, north, zoom } = dto;
+    const { west, south, east, north, zoom = 4 } = dto;
     const limit = getLimitByZoom(zoom);
+    const precision = getPercision(zoom);
+    const roundedWest = roundCoord(west, precision);
+    const roundedSouth = roundCoord(south, precision);
+    const roundedEast = roundCoord(east, precision);
+    const roundedNorth = roundCoord(north, precision);
 
-    const cacheKey = `map:${west}:${south}:${east}:${north}:${zoom}`;
+    const cacheKey = `map:${roundedWest}:${roundedSouth}:${roundedEast}:${roundedNorth}`;
     const cached = await this.redis.get<{
       data: MapEarthquake[];
       total: number;
@@ -37,13 +42,26 @@ export class MapService {
       this.prisma.$queryRaw<MapEarthquake[]>(Prisma.sql`
         SELECT id, magnitude, depth, latitude, longitude, location, "occurredAt"
         FROM ${tableName}
-        WHERE geom && ST_MakeEnvelope(${west}, ${south}, ${east}, ${north}, ${SRID})
+        WHERE geom && ST_MakeEnvelope(
+          ${roundedWest},
+          ${roundedSouth},
+          ${roundedEast},
+          ${roundedNorth},
+          ${SRID}
+        )
+        ORDER BY "occurredAt" DESC
         LIMIT ${limit}
       `),
       this.prisma.$queryRaw<[{ count: bigint }]>(Prisma.sql`
         SELECT COUNT(*) as count
         FROM ${tableName}
-        WHERE geom && ST_MakeEnvelope(${west}, ${south}, ${east}, ${north}, ${SRID})
+        WHERE geom && ST_MakeEnvelope(
+          ${roundedWest},
+          ${roundedSouth},
+          ${roundedEast},
+          ${roundedNorth},
+          ${SRID}
+      )
       `),
     ]);
 
