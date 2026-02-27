@@ -1,5 +1,6 @@
-import { Controller, Get, Query } from "@nestjs/common";
+import { Controller, Get, Param, Query, Res } from "@nestjs/common";
 import { ApiOkResponse, ApiOperation, ApiTags } from "@nestjs/swagger";
+import { Response } from "express";
 
 import { GetMapDto } from "./dto/get-map.dto";
 import { MapResponseDto } from "./dto/map-response.dto";
@@ -15,5 +16,23 @@ export class MapController {
   @ApiOkResponse({ type: MapResponseDto })
   async getMapData(@Query() query: GetMapDto) {
     return this.mapService.getMap(query);
+  }
+
+  @Get("tiles/:z/:x/:y")
+  async getTile(
+    @Param("z") z: number,
+    @Param("x") x: number,
+    @Param("y") y: number,
+    @Res() res: Response,
+  ) {
+    const tile = await this.mapService.getTile({ z: +z, x: +x, y: +y });
+
+    res.setHeader("Content-Type", "application/x-protobuf");
+    res.setHeader("Cache-Control", "public, max-age=60");
+
+    if (!tile) {
+      return res.status(204).send();
+    }
+    res.send(tile);
   }
 }

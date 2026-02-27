@@ -75,4 +75,33 @@ export class MapService {
 
     return result;
   }
+
+  async getTile({ z, x, y }: { z: number; x: number; y: number }) {
+    const tableName = Prisma.raw(`"${DB_EARTHQUAKE_NAME}"`);
+
+    const result = await this.prisma.$queryRaw<
+      [{ st_asmvt: Buffer }]
+    >(Prisma.sql`
+    SELECT ST_AsMVT(tile, 'earthquakes', 4096, 'geom')
+    FROM (
+      SELECT
+        id,
+        magnitude,
+        depth,
+        location,
+        "occurredAt",
+        ST_AsMVTGeom(
+          geom,
+          ST_TileEnvelope(${z}, ${x}, ${y}),
+          4096,
+          256,
+          true
+        ) AS geom
+      FROM ${tableName}
+      WHERE geom && ST_TileEnvelope(${z}, ${x}, ${y})
+    ) AS tile;
+  `);
+
+    return result[0]?.st_asmvt;
+  }
 }
