@@ -91,16 +91,18 @@ export class MapService {
         location,
         "occurredAt",
         ST_AsMVTGeom(
-          geom,
-          ST_TileEnvelope(${z}, ${x}, ${y}),
-          4096,
-          256,
-          true
-        ) AS geom
+        ST_Transform(geom, 3857),
+        ST_TileEnvelope(${z}, ${x}, ${y}),
+        4096,
+        256,
+        true
+      ) AS geom
       FROM ${tableName}
       WHERE geom && ST_TileEnvelope(${z}, ${x}, ${y})
     ) AS tile;
   `);
+
+    console.log("tile length:", result[0]?.st_asmvt?.length);
 
     return result[0]?.st_asmvt;
   }
