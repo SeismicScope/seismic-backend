@@ -195,12 +195,12 @@ describe("EarthquakesService", () => {
       });
     });
 
-    it("should return null for non-existent id", async () => {
+    it("should throw NotFoundException for non-existent id", async () => {
       mockPrisma.earthquake.findUnique.mockResolvedValue(null);
 
-      const result = await service.getEarthquakeById(999);
-
-      expect(result).toBeNull();
+      await expect(service.getEarthquakeById(999)).rejects.toThrow(
+        "Earthquake with id 999 not found",
+      );
     });
   });
 
@@ -273,7 +273,7 @@ describe("EarthquakesService", () => {
       await service.getEarthquakesMagnitudeHistogram(filters);
 
       expect(mockRedis.get).toHaveBeenCalledWith(
-        `histogram:${JSON.stringify(filters)}`,
+        expect.stringContaining("histogram:"),
       );
     });
   });

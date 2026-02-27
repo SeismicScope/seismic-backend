@@ -27,7 +27,7 @@ export class MapService {
     const roundedEast = roundCoord(east, precision);
     const roundedNorth = roundCoord(north, precision);
 
-    const cacheKey = `map:${roundedWest}:${roundedSouth}:${roundedEast}:${roundedNorth}`;
+    const cacheKey = `map:${roundedWest}:${roundedSouth}:${roundedEast}:${roundedNorth}:${zoom}`;
     const cached = await this.redis.get<{
       data: MapEarthquake[];
       total: number;
