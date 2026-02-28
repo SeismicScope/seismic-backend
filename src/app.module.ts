@@ -18,6 +18,7 @@ import { ImportModule } from "./modules/import/import.module";
 import { MapModule } from "./modules/map/map.module";
 import { MetricsModule } from "./modules/metrics/metrics.module";
 import { RedisModule } from "./modules/redis/redis.module";
+import { ShortenerModule } from "./modules/shortener/shortener.module";
 
 @Module({
   imports: [
@@ -55,6 +56,7 @@ import { RedisModule } from "./modules/redis/redis.module";
     AnalyticsModule,
     AuthModule,
     MetricsModule,
+    ShortenerModule,
   ],
   controllers: [],
   providers: [

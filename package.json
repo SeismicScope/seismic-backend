@@ -60,6 +60,7 @@
     "ioredis": "^5.9.2",
     "joi": "^18.0.2",
     "multer": "^2.0.2",
+    "nanoid": "^5.1.6",
     "nest-winston": "^1.10.2",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",

@@ -49,3 +49,11 @@ model spatial_ref_sys {
   srtext    String? @db.VarChar(2048)
   proj4text String? @db.VarChar(2048)
 }
+
+model ShortLink {
+  id        Int      @id @default(autoincrement())
+  code      String   @unique
+  url       String
+  clicks    Int      @default(0)
+  createdAt DateTime @default(now())
+}
