@@ -1,3 +1,10 @@
+# [1.6.0](https://github.com/SeismicScope/seismic-backend/compare/v1.5.0...v1.6.0) (2026-02-28)
+
+### Features
+
+- **shortener:** add expiration and cleanup for short links ([df2e7aa](https://github.com/SeismicScope/seismic-backend/commit/df2e7aa49cc1cefda75aed2ca63f6060254828f5))
+- **shortener:** add QR code generation endpoint for short links ([7aab62e](https://github.com/SeismicScope/seismic-backend/commit/7aab62e3d3cd9bd341d0ab312a55b72353be4b1b))
+
 # [1.5.0](https://github.com/SeismicScope/seismic-backend/compare/v1.4.0...v1.5.0) (2026-02-28)
 
 ### Features
