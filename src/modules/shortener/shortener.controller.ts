@@ -48,7 +48,7 @@ export class ShortenerController {
     res.status(302).redirect(url);
   }
 
-  @Get(":code/qr")
+  @Get("/qr/:code")
   @ApiOperation({ summary: "Get QR code for short link" })
   @ApiParam({ name: "code", example: "xK3mP9aQ" })
   @ApiResponse({ status: 200, description: "Base64 PNG image" })
@@ -61,7 +61,7 @@ export class ShortenerController {
     return { qr };
   }
 
-  @Get(":code/resolve")
+  @Get("/resolve/:code")
   @ApiOperation({ summary: "Get original URL by code" })
   async resolve(@Param("code") code: string) {
     const url = await this.shortenerService.redirect(code);
