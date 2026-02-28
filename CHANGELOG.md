@@ -1,3 +1,9 @@
+# [1.8.0](https://github.com/SeismicScope/seismic-backend/compare/v1.7.0...v1.8.0) (2026-02-28)
+
+### Features
+
+- **shortener:** add redirect endpoint to controller ([7441aa2](https://github.com/SeismicScope/seismic-backend/commit/7441aa273b716b61ef5e5c5d4069b59e09740c75))
+
 # [1.7.0](https://github.com/SeismicScope/seismic-backend/compare/v1.6.0...v1.7.0) (2026-02-28)
 
 ### Features
