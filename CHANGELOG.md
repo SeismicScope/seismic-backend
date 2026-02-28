@@ -1,3 +1,9 @@
+# [1.5.0](https://github.com/SeismicScope/seismic-backend/compare/v1.4.0...v1.5.0) (2026-02-28)
+
+### Features
+
+- **shortener:** add URL shortener module with Redis caching ([b265719](https://github.com/SeismicScope/seismic-backend/commit/b2657192af57589ca094f280c0dd4e5ebc0554a1))
+
 # [1.4.0](https://github.com/SeismicScope/seismic-backend/compare/v1.3.2...v1.4.0) (2026-02-28)
 
 ### Features
