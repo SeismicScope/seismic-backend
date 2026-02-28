@@ -60,4 +60,13 @@ export class ShortenerController {
 
     return { qr };
   }
+
+  @Get(":code/resolve")
+  @ApiOperation({ summary: "Get original URL by code" })
+  async resolve(@Param("code") code: string) {
+    const url = await this.shortenerService.redirect(code);
+    if (!url) throw new NotFoundException("Short link not found");
+
+    return { url };
+  }
 }
