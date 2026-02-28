@@ -1,5 +1,6 @@
 import { Controller, Get, Param, Query, Res } from "@nestjs/common";
 import { ApiOkResponse, ApiOperation, ApiTags } from "@nestjs/swagger";
+import { SkipThrottle } from "@nestjs/throttler";
 import { Response } from "express";
 
 import { GetMapDto } from "./dto/get-map.dto";
@@ -18,6 +19,7 @@ export class MapController {
     return this.mapService.getMap(query);
   }
 
+  @SkipThrottle()
   @Get("tiles/:z/:x/:y")
   async getTile(
     @Param("z") z: number,
@@ -27,12 +29,13 @@ export class MapController {
   ) {
     const tile = await this.mapService.getTile({ z: +z, x: +x, y: +y });
 
-    res.setHeader("Content-Type", "application/x-protobuf");
+    res.setHeader("Content-Type", "application/vnd.mapbox-vector-tile");
+    res.setHeader("Content-Encoding", "identity");
     res.setHeader("Cache-Control", "public, max-age=60");
 
     if (!tile) {
       return res.status(204).send();
     }
-    res.send(tile);
+    res.end(tile);
   }
 }

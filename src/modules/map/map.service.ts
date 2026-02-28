@@ -83,30 +83,32 @@ export class MapService {
       [{ st_asmvt: Buffer }]
     >(Prisma.sql`
     SELECT ST_AsMVT(tile, 'earthquakes', 4096, 'geom')
-FROM (
-  SELECT
-    id,
-    magnitude,
-    depth,
-    location,
-    "occurredAt",
-    ST_AsMVTGeom(
-      ST_Transform(geom, 3857),
-      ST_TileEnvelope(${z}, ${x}, ${y}),
-      4096,
-      256,
-      true
-    ) AS geom
-  FROM ${tableName}
-  WHERE ST_Intersects(
-    ST_Transform(geom, 3857),
-    ST_TileEnvelope(${z}, ${x}, ${y})
-  )
-) AS tile;
+    FROM (
+      SELECT
+        id,
+        magnitude,
+        depth,
+        location,
+        "occurredAt",
+        ST_AsMVTGeom(
+          ST_Transform(geom, 3857),
+          ST_TileEnvelope(${z}, ${x}, ${y}),
+          4096,
+          256,
+          true
+        ) AS geom
+      FROM ${tableName}
+      WHERE ST_Intersects(
+        ST_Transform(geom, 3857),
+        ST_TileEnvelope(${z}, ${x}, ${y})
+      )
+    ) AS tile;
   `);
 
-    console.log("tile length:", result[0]?.st_asmvt?.length);
+    const raw = result[0]?.st_asmvt;
 
-    return result[0]?.st_asmvt;
+    if (!raw) return null;
+
+    return Buffer.from(raw);
   }
 }
