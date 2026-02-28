@@ -4,6 +4,10 @@ import { PrismaService } from "prisma/prisma.service";
 import { RedisService } from "../redis/redis.service";
 import { ShortenerService } from "./shortener.service";
 
+jest.mock("@/lib/shortener-link", () => ({
+  encodeLink: () => "xK3mP9aQ",
+}));
+
 const mockPrismaService = {
   shortLink: {
     create: jest.fn(),
@@ -11,6 +15,10 @@ const mockPrismaService = {
     findUnique: jest.fn(),
   },
 };
+
+jest.mock("nanoid", () => ({
+  customAlphabet: () => () => "xK3mP9aQ",
+}));
 
 const mockRedisService = {
   get: jest.fn(),

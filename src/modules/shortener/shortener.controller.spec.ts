@@ -10,6 +10,9 @@ const mockShortenerService = {
   createShortLink: jest.fn(),
   redirect: jest.fn(),
 };
+jest.mock("@/lib/shortener-link", () => ({
+  encodeLink: () => "xK3mP9aQ",
+}));
 
 const mockResponse: Partial<Response> = {
   status: jest.fn().mockReturnThis(),
