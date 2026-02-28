@@ -1,3 +1,9 @@
+# [1.7.0](https://github.com/SeismicScope/seismic-backend/compare/v1.6.0...v1.7.0) (2026-02-28)
+
+### Features
+
+- **shortener:** add endpoint to resolve short code to original URL ([960c148](https://github.com/SeismicScope/seismic-backend/commit/960c14838f6fd43b0faa5400bb1e7bfd291017e9))
+
 # [1.6.0](https://github.com/SeismicScope/seismic-backend/compare/v1.5.0...v1.6.0) (2026-02-28)
 
 ### Features
