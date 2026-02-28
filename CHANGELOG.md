@@ -1,3 +1,9 @@
+# [1.4.0](https://github.com/SeismicScope/seismic-backend/compare/v1.3.2...v1.4.0) (2026-02-28)
+
+### Features
+
+- **db:** add pre-transformed EPSG:3857 geometry column with spatial index for earthquakes ([42c748f](https://github.com/SeismicScope/seismic-backend/commit/42c748f8fbd7a3252b65759e473ff476f7a0c365))
+
 ## [1.3.2](https://github.com/SeismicScope/seismic-backend/compare/v1.3.1...v1.3.2) (2026-02-27)
 
 ### Bug Fixes
