@@ -74,7 +74,7 @@ export class ShortenerService {
   }
 
   async generateQR(code: string): Promise<string> {
-    const shortUrl = `${process.env.APP_URL}/api/v1/shortener/${code}`;
+    const shortUrl = `${process.env.FRONTEND_URL}/s/${code}`;
 
     return QRCode.toDataURL(shortUrl);
   }
