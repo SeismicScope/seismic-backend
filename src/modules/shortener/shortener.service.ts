@@ -1,6 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { Cron, CronExpression } from "@nestjs/schedule";
 import { PrismaService } from "prisma/prisma.service";
+import * as QRCode from "qrcode";
 
 import { encodeLink } from "@/lib/shortener-link";
 
@@ -70,5 +71,11 @@ export class ShortenerService {
       .catch(() => {});
 
     return link.url;
+  }
+
+  async generateQR(code: string): Promise<string> {
+    const shortUrl = `${process.env.APP_URL}/api/v1/shortener/${code}`;
+
+    return QRCode.toDataURL(shortUrl);
   }
 }

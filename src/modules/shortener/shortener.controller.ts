@@ -47,4 +47,17 @@ export class ShortenerController {
 
     res.status(302).redirect(url);
   }
+
+  @Get(":code/qr")
+  @ApiOperation({ summary: "Get QR code for short link" })
+  @ApiParam({ name: "code", example: "xK3mP9aQ" })
+  @ApiResponse({ status: 200, description: "Base64 PNG image" })
+  async getQR(@Param("code") code: string) {
+    const url = await this.shortenerService.redirect(code);
+    if (!url) throw new NotFoundException("Short link not found");
+
+    const qr = await this.shortenerService.generateQR(code);
+
+    return { qr };
+  }
 }
