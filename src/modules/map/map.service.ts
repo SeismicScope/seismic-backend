@@ -103,9 +103,9 @@ export class MapService {
             geom_3857,
             ST_TileEnvelope(${z}, ${x}, ${y})
           )
-  ) AS q
-  WHERE geom IS NOT NULL;
-`);
+    ) AS q
+    WHERE geom IS NOT NULL;
+  `);
 
     const raw = result[0]?.st_asmvt;
 
