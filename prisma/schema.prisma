@@ -17,11 +17,13 @@ model Earthquake {
   location   String?
   createdAt  DateTime                 @default(now())
   geom       Unsupported("geometry")?
+  geom_3857 Unsupported("geometry(Point,3857)")?
 
   @@index([magnitude], map: "earthquake_magnitude_idx")
   @@index([occurredAt], map: "earthquake_occurredAt_idx")
   @@index([magnitude, occurredAt], map: "earthquake_mag_date_idx")
   @@index([geom], map: "Earthquake_geom_idx", type: Gist)
+  @@index([geom_3857], map: "Earthquake_geom_3857_idx", type: Gist)
 }
 
 model User {
