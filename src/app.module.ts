@@ -3,6 +3,7 @@ import { Module } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
 import { ConfigService } from "@nestjs/config";
 import { APP_GUARD } from "@nestjs/core";
+import { ScheduleModule } from "@nestjs/schedule";
 import { ThrottlerGuard, ThrottlerModule } from "@nestjs/throttler";
 import { SentryModule } from "@sentry/nestjs/setup";
 import { WinstonModule } from "nest-winston";
@@ -32,6 +33,7 @@ import { ShortenerModule } from "./modules/shortener/shortener.module";
       { name: "default", ttl: 60_000, limit: 500 },
       { name: "strict", ttl: 60_000, limit: 50 },
     ]),
+    ScheduleModule.forRoot(),
     BullModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService) => {

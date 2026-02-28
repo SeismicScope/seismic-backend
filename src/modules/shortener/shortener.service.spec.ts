@@ -54,6 +54,7 @@ describe("ShortenerService", () => {
         url,
         clicks: 0,
         createdAt: new Date(),
+        expiresAt: new Date(),
       };
       const updatedLink = { ...createdLink, code: "xK3mP9aQ" };
 
@@ -63,7 +64,7 @@ describe("ShortenerService", () => {
       const result = await service.createShortLink({ url });
 
       expect(mockPrismaService.shortLink.create).toHaveBeenCalledWith({
-        data: { url, code: "" },
+        data: { url, code: "", expiresAt: expect.any(Date) },
       });
       expect(mockPrismaService.shortLink.update).toHaveBeenCalledWith({
         where: { id: 1 },

@@ -1,10 +1,12 @@
 import { Injectable } from "@nestjs/common";
+import { Cron, CronExpression } from "@nestjs/schedule";
 import { PrismaService } from "prisma/prisma.service";
 
 import { encodeLink } from "@/lib/shortener-link";
 
 import { RedisService } from "../redis/redis.service";
 import { CreateShortenerDto } from "./dto/create-shortener.dto";
+import { calculateTTL, getExpiresAtDate } from "./helpers";
 
 @Injectable()
 export class ShortenerService {
@@ -13,9 +15,20 @@ export class ShortenerService {
     private readonly redis: RedisService,
   ) {}
 
+  @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
+  async cleanupExpiredLinks() {
+    await this.prisma.shortLink.deleteMany({
+      where: {
+        expiresAt: { lt: new Date() },
+      },
+    });
+  }
+
   async createShortLink({ url }: CreateShortenerDto) {
+    const expiresAt = getExpiresAtDate();
+
     const link = await this.prisma.shortLink.create({
-      data: { url, code: "" },
+      data: { url, code: "", expiresAt },
     });
 
     const code = encodeLink();
@@ -45,7 +58,9 @@ export class ShortenerService {
 
     if (!link) return null;
 
-    await this.redis.set(`shortlink:${code}`, link.url, 86400);
+    const ttl = calculateTTL(link.expiresAt);
+
+    await this.redis.set(`shortlink:${code}`, link.url, ttl);
 
     this.prisma.shortLink
       .update({

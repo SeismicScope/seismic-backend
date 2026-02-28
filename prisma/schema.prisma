@@ -55,5 +55,6 @@ model ShortLink {
   code      String   @unique
   url       String
   clicks    Int      @default(0)
+  expiresAt DateTime?
   createdAt DateTime @default(now())
 }
