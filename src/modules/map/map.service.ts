@@ -82,8 +82,8 @@ export class MapService {
     const result = await this.prisma.$queryRaw<
       [{ st_asmvt: Buffer }]
     >(Prisma.sql`
-    SELECT ST_AsMVT(tile, 'earthquakes', 4096, 'geom')
-    FROM (
+    SELECT ST_AsMVT(q, 'earthquakes', 4096, 'geom')
+      FROM (
       SELECT
         id,
         magnitude,
@@ -91,19 +91,17 @@ export class MapService {
         location,
         "occurredAt",
         ST_AsMVTGeom(
-          ST_Transform(geom, 3857),
+          geom_3857,
           ST_TileEnvelope(${z}, ${x}, ${y}),
           4096,
           256,
           true
         ) AS geom
-      FROM ${tableName}
-      WHERE ST_Intersects(
-        ST_Transform(geom, 3857),
-        ST_TileEnvelope(${z}, ${x}, ${y})
-      )
-    ) AS tile;
-  `);
+      FROM "Earthquake"
+      WHERE geom_3857 && ST_TileEnvelope(${z}, ${x}, ${y})
+    ) AS q
+      WHERE geom IS NOT NULL;
+    `);
 
     const raw = result[0]?.st_asmvt;
 
