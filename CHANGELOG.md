@@ -1,3 +1,9 @@
+# [1.9.0](https://github.com/SeismicScope/seismic-backend/compare/v1.8.0...v1.9.0) (2026-02-28)
+
+### Features
+
+- **earthquake:** add geom_3857 column with SRID 3857 projection for spatial queries ([a3e9e9e](https://github.com/SeismicScope/seismic-backend/commit/a3e9e9e48416d29ac5e94adf1e2004a5cdd8f1ff))
+
 # [1.8.0](https://github.com/SeismicScope/seismic-backend/compare/v1.7.0...v1.8.0) (2026-02-28)
 
 ### Features
