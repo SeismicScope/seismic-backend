@@ -1,3 +1,9 @@
+# [1.11.0](https://github.com/SeismicScope/seismic-backend/compare/v1.10.0...v1.11.0) (2026-03-01)
+
+### Features
+
+- **earthquakes:** add bounding box filtering support for earthquake queries ([236523a](https://github.com/SeismicScope/seismic-backend/commit/236523a26b5b42133b1f824dc79ebca972cc2323))
+
 # [1.10.0](https://github.com/SeismicScope/seismic-backend/compare/v1.9.0...v1.10.0) (2026-03-01)
 
 ### Features
