@@ -1,3 +1,9 @@
+# [1.10.0](https://github.com/SeismicScope/seismic-backend/compare/v1.9.0...v1.10.0) (2026-03-01)
+
+### Features
+
+- **map:** add dashboard endpoint with reduced data limit for improved performance ([752f802](https://github.com/SeismicScope/seismic-backend/commit/752f8020c53fbb7753a60ced1f68d75d41f505ba))
+
 # [1.9.0](https://github.com/SeismicScope/seismic-backend/compare/v1.8.0...v1.9.0) (2026-02-28)
 
 ### Features
