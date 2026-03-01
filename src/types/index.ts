@@ -1,3 +1,10 @@
+export type BboxParams = {
+  west?: number;
+  east?: number;
+  north?: number;
+  south?: number;
+};
+
 export type EarthquakeFilterParams = {
   minMag?: number;
   maxMag?: number;
@@ -5,7 +12,7 @@ export type EarthquakeFilterParams = {
   maxDepth?: number;
   dateFrom?: Date;
   dateTo?: Date;
-};
+} & BboxParams;
 
 export type CsvRow = {
   time: string;

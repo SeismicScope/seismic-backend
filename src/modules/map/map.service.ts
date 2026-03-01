@@ -2,6 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { Prisma } from "@prisma/client";
 import { PrismaService } from "prisma/prisma.service";
 
+import { buildEarthquakeWhereSql } from "@/lib/build-earthquake-where";
 import type { MapEarthquake } from "@/types";
 
 import { DB_EARTHQUAKE_NAME, SRID } from "../../constants";
@@ -19,7 +20,7 @@ export class MapService {
   ) {}
 
   async getMap(dto: GetMapDto, isDashboard = false) {
-    const { west, south, east, north, zoom = 4 } = dto;
+    const { west, south, east, north, zoom = 4, ...filters } = dto;
     const limit = getLimitByZoom(zoom);
     const precision = getPercision(zoom);
     const roundedWest = roundCoord(west, precision);
@@ -27,7 +28,8 @@ export class MapService {
     const roundedEast = roundCoord(east, precision);
     const roundedNorth = roundCoord(north, precision);
 
-    const cacheKey = `map:${roundedWest}:${roundedSouth}:${roundedEast}:${roundedNorth}:${zoom}`;
+    const cacheKey = `map:${isDashboard ? "d" : "m"}:${roundedWest}:${roundedSouth}:${roundedEast}:${roundedNorth}:${zoom}:${JSON.stringify(filters, Object.keys(filters).sort())}`;
+
     const cached = await this.redis.get<{
       data: MapEarthquake[];
       total: number;
@@ -37,6 +39,7 @@ export class MapService {
     if (cached) return cached;
 
     const tableName = Prisma.raw(`"${DB_EARTHQUAKE_NAME}"`);
+    const whereSql = buildEarthquakeWhereSql(filters);
 
     const [data, countResult] = await Promise.all([
       this.prisma.$queryRaw<MapEarthquake[]>(Prisma.sql`
@@ -49,6 +52,7 @@ export class MapService {
           ${roundedNorth},
           ${SRID}
         )
+        ${whereSql}
         ORDER BY "occurredAt" DESC
         LIMIT ${limit}
       `),
@@ -61,7 +65,8 @@ export class MapService {
           ${roundedEast},
           ${roundedNorth},
           ${SRID}
-      )
+        )
+        ${whereSql}
       `),
     ]);
 

@@ -1,7 +1,9 @@
 import { Type } from "class-transformer";
 import { IsDefined, IsNumber, IsOptional } from "class-validator";
 
-export class GetMapDto {
+import { BaseEarthquakeFilterDto } from "@/dto/base-earthquake-filter.dto";
+
+export class GetMapDto extends BaseEarthquakeFilterDto {
   @IsDefined({ message: "West is required" })
   @Type(() => Number)
   @IsNumber()

@@ -30,4 +30,24 @@ export class GetEarthquakesDto extends BaseEarthquakeFilterDto {
   @IsString()
   @IsIn(SORT_OPTIONS)
   sort?: SortOption;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  west?: number;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  east?: number;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  north?: number;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  south?: number;
 }
