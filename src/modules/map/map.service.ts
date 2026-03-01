@@ -18,7 +18,7 @@ export class MapService {
     private readonly redis: RedisService,
   ) {}
 
-  async getMap(dto: GetMapDto) {
+  async getMap(dto: GetMapDto, isDashboard = false) {
     const { west, south, east, north, zoom = 4 } = dto;
     const limit = getLimitByZoom(zoom);
     const precision = getPercision(zoom);

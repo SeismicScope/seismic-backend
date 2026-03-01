@@ -1,6 +1,8 @@
 const MAX_LIMIT = 200_000;
+const DASHBOARD_LIMIT = 15_000;
 
-export function getLimitByZoom(zoom?: number): number {
+export function getLimitByZoom(zoom?: number, isDashboard?: boolean): number {
+  if (isDashboard) return DASHBOARD_LIMIT;
   if (zoom === undefined) return MAX_LIMIT;
 
   if (zoom <= 4) return 70_000;

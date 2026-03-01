@@ -19,6 +19,15 @@ export class MapController {
     return this.mapService.getMap(query);
   }
 
+  @Get("/dashboard")
+  @ApiOperation({
+    summary: "Get earthquake points within map bounds for dashboard",
+  })
+  @ApiOkResponse({ type: MapResponseDto })
+  async getDashboardData(@Query() query: GetMapDto) {
+    return this.mapService.getMap(query, true);
+  }
+
   @SkipThrottle()
   @Get("tiles/:z/:x/:y")
   async getTile(
