@@ -98,7 +98,7 @@ describe("MapService", () => {
       await service.getMap(defaultDto);
 
       expect(mockRedis.set).toHaveBeenCalledWith(
-        `map:${defaultDto.west}:${defaultDto.south}:${defaultDto.east}:${defaultDto.north}:${defaultDto.zoom}`,
+        `map:m:${defaultDto.west}:${defaultDto.south}:${defaultDto.east}:${defaultDto.north}:${defaultDto.zoom}:{}`,
         expect.objectContaining({
           data: [{ id: 1 }],
           total: 1,
@@ -117,7 +117,7 @@ describe("MapService", () => {
       const dto = { west: -10, south: -20, east: 30, north: 40, zoom: 7 };
       await service.getMap(dto);
 
-      expect(mockRedis.get).toHaveBeenCalledWith("map:-10:-20:30:40:7");
+      expect(mockRedis.get).toHaveBeenCalledWith("map:m:-10:-20:30:40:7:{}");
     });
 
     it("should handle large total count", async () => {
