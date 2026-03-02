@@ -14,6 +14,7 @@ import { Request, Response } from "express";
 import { AuthService } from "./auth.service";
 import { LoginDto } from "./dto/login.dto";
 import { JwtGuard } from "./guards/jwt.guard";
+import { OptionalJwtGuard } from "./guards/optional-jwt.guard";
 import type { JwtPayload } from "./types";
 
 @ApiTags("Auth")
@@ -50,11 +51,10 @@ export class AuthController {
 
     return { success: true };
   }
-
   @Get("me")
-  @UseGuards(JwtGuard)
+  @UseGuards(OptionalJwtGuard)
   @ApiOperation({ summary: "Get current authenticated user" })
-  getMe(@Req() req: Request & { user: JwtPayload }) {
-    return req.user;
+  getMe(@Req() req: Request & { user?: JwtPayload }) {
+    return req.user ?? null;
   }
 }
